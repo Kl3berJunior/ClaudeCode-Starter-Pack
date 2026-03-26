@@ -1,4 +1,4 @@
-# ClaudeCode-Stater-Pack — Resumo Detalhado
+# 🤖 ClaudeCode-Stater-Pack — Resumo Detalhado
 
 ## O que é
 
