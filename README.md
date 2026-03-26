@@ -21,6 +21,10 @@ ClaudeCode-Stater-Pack/
     |-- .claude/
     |   |-- settings.json            # Permissoes locais e MCPs/plugins habilitados
     |   |-- settings.local.json      # Ajustes pessoais locais, fora do versionamento
+    |   |-- agents/
+    |   |   |-- review-deep.md       # Agente Opus: analise arquitetural profunda
+    |   |   |-- explain.md           # Agente Sonnet: explicacao concisa de simbolos e arquivos
+    |   |   `-- agent-router.md      # Agente roteador: classifica e delega por complexidade
     |   `-- commands/
     |       |-- backlog.md           # Slash command para listar e atualizar backlog operacional
     |       |-- daily-memory.md      # Slash command para registrar memoria diaria
@@ -109,6 +113,32 @@ Lista e atualiza tasks em `Relatorios/Swarm/task-backlog.md`.
 ### `/daily-memory`
 
 Cria ou atualiza a memoria diaria e avalia promocao para `MEMORY.md`.
+
+---
+
+## Agentes (`.claude/agents/`)
+
+Agentes sao subagentes especializados com modelo e ferramentas fixos. O Claude Code os invoca automaticamente por contexto ou diretamente via `/nome-do-agente`.
+
+### `/review-deep <arquivo>`
+
+Analise arquitetural profunda via **Opus**. Identifica problemas de design, acoplamento e risco. Propoe refatoracoes com localizacao exata. Nao modifica arquivos.
+
+### `/explain <simbolo-ou-arquivo>`
+
+Explicacao concisa do comportamento via **Sonnet**. Foco no que entra, o que sai e efeitos colaterais. Sem analise global.
+
+### `/agent-router <tarefa>`
+
+Roteador de complexidade via **Sonnet**. Classifica a tarefa (Opus / Sonnet / Haiku) e spawna o subagente adequado. Suporta execucao paralela de partes independentes.
+
+### Criterio de roteamento
+
+| Modelo | Quando usar |
+|---|---|
+| Opus | Arquitetura, refatoracao cross-repo, debugging sem causa conhecida |
+| Sonnet | Geracao de codigo, testes, explicacoes, buscas |
+| Haiku | Glob, grep, rename, verificacoes mecanicas |
 
 ---
 

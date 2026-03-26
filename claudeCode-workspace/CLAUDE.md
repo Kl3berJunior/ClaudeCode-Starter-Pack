@@ -118,6 +118,29 @@ Auto-gestao:
 - Claude deve propor limpeza quando houver worktree limpa, mesclada ou sem uso, mas deve pedir confirmacao antes de remover
 - Claude deve preferir `git worktree prune` para limpar metadata orfa e `git worktree remove` apenas para worktrees elegiveis e confirmadas
 
+## Roteamento de modelo (agentes e subagentes)
+
+Ao spawnar subagentes via ferramenta Agent, escolher o modelo pelo tipo de tarefa:
+
+| Modelo | Quando usar |
+|---|---|
+| `opus` | Arquitetura, refatoracao cross-repo, debugging com causa desconhecida, decisoes de alto impacto |
+| `sonnet` | Geracao de codigo, testes, explicacoes, buscas, tarefas com spec clara |
+| `haiku` | Operacoes mecanicas: glob, grep, rename, verificacoes simples |
+
+Regras:
+
+- declarar o modelo escolhido e o motivo antes de spawnar o subagente
+- tarefas independentes podem rodar em subagentes paralelos com modelos diferentes
+- nao usar Opus para tarefas simples: custo e latencia nao justificam
+- nao usar Haiku para tarefas que exigem raciocinio encadeado
+
+Agentes disponiveis em `.claude/agents/`:
+
+- `/review-deep <arquivo>` — analise profunda via Opus
+- `/explain <simbolo-ou-arquivo>` — explicacao concisa via Sonnet
+- `/agent-router <tarefa>` — roteamento automatico por complexidade
+
 ## Git
 
 - nao commitar em branch protegida sem instrucao clara
