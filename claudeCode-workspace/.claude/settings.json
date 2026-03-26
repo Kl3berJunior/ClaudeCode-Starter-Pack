@@ -1,18 +1,20 @@
 {
-    "permissions": {
-        "allow": [
-            "Bash(git:*)",
-            "Bash(ls:*)",
-            "Bash(cat:*)",
-            "Read(*)",
-            "Write(*)",
-            "Edit(*)",
-            "Glob(*)",
-            "Grep(*)"
-        ],
-        "deny": []
-    },
-    "enabledPlugins": {
-        "telegram@claude-plugins-official": true
-    }
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Read(*)",
+      "Write(*)",
+      "Edit(*)",
+      "Glob(*)",
+      "Grep(*)"
+    ],
+    "deny": []
+  },
+  "enabledPlugins": {
+    "telegram@claude-plugins-official": true,
+    "serena@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true
+  }
 }
