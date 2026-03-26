@@ -1,358 +1,218 @@
-# 🤖 ClaudeCode-Stater-Pack — Resumo Detalhado
+# ClaudeCode-Stater-Pack - Resumo
 
-## O que é
+## O que e
 
-Um template de workspace profissional para o **Claude Code** (CLI da Anthropic). Fornece uma estrutura pronta com contratos operacionais, sistema de memória, monitoramento de saúde e gerenciamento de tarefas — tudo em português.
+Template de workspace para Claude Code com contrato operacional, memoria, MCPs e gestao de worktrees.
 
-O pack tem duas partes independentes:
+O pack tem duas partes:
 
-- `claudeCode-workspace/` — o workspace principal onde Claude opera
-- `claudeCode-repo/` — o template que vai dentro de cada repositório de código
+- `claudeCode-workspace/` - workspace principal
+- `claudeCode-repo/` - template para cada repositorio
 
 ---
 
 ## Estrutura de arquivos
 
-```
+```text
 ClaudeCode-Stater-Pack/
-├── claudeCode-repo/
-│   └── CLAUDE.md                        # Template por repositório
-└── claudeCode-workspace/
-    ├── .claude/
-    │   ├── settings.json                # Permissões do Claude Code
-    │   └── commands/
-    │       ├── backlog.md               # Slash command /backlog
-    │       ├── daily-memory.md          # Slash command /daily-memory
-    │       └── heartbeat.md             # Slash command /heartbeat
-    ├── memory/
-    │   └── README.md                    # Instruções de uso da memória diária
-    ├── .gitignore
-    ├── CLAUDE.md                        # Contrato operacional principal
-    ├── HEARTBEAT.md                     # Checklist de saúde operacional
-    ├── MEMORY.md                        # Memória durável curada
-    ├── SOUL.md                          # Princípios permanentes do fluxo
-    ├── TOOLS.md                         # Template de ferramentas e comandos
-    └── USER.md                          # Contexto operacional do time
+|-- claudeCode-repo/
+|   `-- CLAUDE.md                    # Template para copiar para dentro de cada repo de codigo
+`-- claudeCode-workspace/
+    |-- .claude/
+    |   |-- settings.json            # Permissoes locais e MCPs/plugins habilitados
+    |   |-- settings.local.json      # Ajustes pessoais locais, fora do versionamento
+    |   `-- commands/
+    |       |-- backlog.md           # Slash command para listar e atualizar backlog operacional
+    |       |-- daily-memory.md      # Slash command para registrar memoria diaria
+    |       |-- heartbeat.md         # Slash command para checagem rapida de saude operacional
+    |       `-- worktree.md          # Slash command para auditar e operar worktrees
+    |-- .serena/
+    |   |-- .gitignore               # Ignora estado local do Serena dentro da pasta
+    |   |-- project.yml              # Config principal do projeto Serena
+    |   `-- project.local.yml        # Ajustes locais do Serena, quando usados
+    |-- memory/
+    |   `-- README.md                # Instrucao curta sobre memoria diaria
+    |-- .gitignore
+    |-- CLAUDE.md                    # Contrato operacional principal do workspace
+    |-- HEARTBEAT.md                 # Checklist curto de saude operacional
+    |-- MEMORY.md                    # Memoria duravel com contratos e decisoes persistentes
+    |-- SOUL.md                      # Principios permanentes do fluxo de trabalho
+    |-- TOOLS.md                     # Comandos, caminhos, MCPs e padrao de worktrees
+    `-- USER.md                      # Contexto operacional do time e preferencias locais
 ```
 
 ---
 
-## Como funciona — visão geral
+## Como funciona
 
-O Claude Code, ao iniciar uma sessão no workspace, lê o `CLAUDE.md` raiz. Esse arquivo é o **ponto de entrada** de tudo: ele importa os demais arquivos via diretivas `@` e define o que Claude deve fazer obrigatoriamente a cada sessão.
+O Claude Code usa o `CLAUDE.md` do workspace como ponto de entrada.
 
-### Fluxo de startup obrigatório
+### Startup obrigatorio
 
-```
+```text
 1. Ler memory/YYYY-MM-DD.md de hoje
-2. Ler memory/YYYY-MM-DD.md de ontem (se existir)
-3. Executar /heartbeat
-```
-
-Nenhum contexto de sessão anterior é assumido sem verificação. Claude parte sempre do estado atual dos arquivos.
-
----
-
-## Detalhamento de cada componente
-
-### CLAUDE.md (workspace)
-
-Fonte de verdade operacional. Faz quatro coisas:
-
-1. **Importa** os arquivos auxiliares automaticamente via `@SOUL.md`, `@USER.md`, `@TOOLS.md`, `@MEMORY.md`
-2. **Define o startup** obrigatório (leitura de memória + heartbeat)
-3. **Estabelece regras de segurança** — o que Claude pode fazer sem perguntar vs. o que exige confirmação
-4. **Define roteamento de código** — mudanças em repos conhecidos viram tasks do backlog ou sessões diretas, nunca improviso
-
-**Regras de segurança:**
-
-| Sem perguntar | Perguntar antes |
-|---|---|
-| Ler arquivos locais | Publicar conteúdo externo |
-| Investigar estado local | Enviar dados para fora da máquina |
-| Organizar documentação | Apagar de forma destrutiva |
-| Ajustar configuração interna | Expor dados privados |
-
----
-
-### SOUL.md
-
-Princípios fixos que nunca mudam, independente do projeto:
-
-- **Clareza antes de automação** — não executar sem entender
-- **Validação real antes de conclusão** — não marcar como feito sem checar
-- **Artefato antes de memória oral** — escrever antes de dizer
-- **Backlog com fonte** — toda task tem origem rastreável
-- **Segurança por padrão** — segredos fora do versionamento
-- **Logs e relatórios rastreaveis** — tudo auditável
-- **Autonomia com limites explícitos** — Claude age, mas respeita fronteiras
-
----
-
-### USER.md
-
-Template para o time preencher com contexto operacional:
-
-- Linguagem principal dos repositórios
-- Ambiente de deploy
-- Horário de trabalho
-- Restrições de produção
-- Preferências de PR, squash, branch naming
-
-Não armazena segredos, tokens ou senhas.
-
----
-
-### TOOLS.md
-
-Registro de ferramentas e comandos locais, por repositório:
-
-```
-## Repo nome-do-repo
-- build: comando
-- test: comando
-- lint: comando
-- publish: comando
-```
-
-Mantém caminhos concretos atualizados para que Claude execute corretamente sem precisar descobrir.
-
----
-
-### Sistema de memória (dois níveis)
-
-#### Memória diária — `memory/YYYY-MM-DD.md`
-
-Um arquivo por dia. Registra:
-
-- Fatos e eventos do dia
-- Mudanças operacionais
-- Riscos descobertos
-- Links para artefatos gerados
-- Decisões que podem ser promovidas
-
-#### Memória durável — `MEMORY.md`
-
-Conhecimento que sobrevive ao dia. Regras:
-
-- Apenas decisões, contratos e fatos duráveis
-- Sem duplicatas
-- Com caminhos concretos sempre que possível
-
-**Regra de promoção:** um fato da memória diária é promovido para `MEMORY.md` quando tem relevância além do dia atual (ex.: decisão arquitetural, contrato de time, convenção estabelecida).
-
----
-
-### HEARTBEAT.md
-
-Checklist operacional leve. Perguntas que o `/heartbeat` responde:
-
-- Existe task bloqueada sem dono claro?
-- Existe relatório crítico vencido?
-- Existe erro novo no supervisor?
-- A memória do dia foi atualizada?
-
-Se nada precisar de atenção, responde `HEARTBEAT_OK`.
-
----
-
-### Slash Commands (`.claude/commands/`)
-
-São comandos customizados invocados com `/nome` dentro do Claude Code.
-
-#### `/heartbeat`
-
-**O que faz:**
-1. Lê `HEARTBEAT.md`
-2. Verifica tasks bloqueadas em `Relatorios/Swarm/task-backlog.md`
-3. Verifica se a memória do dia foi atualizada
-4. Reporta o estado ou lista o que precisa de atenção
-
-**Quando usar:** sempre ao iniciar uma sessão (é obrigatório pelo CLAUDE.md).
-
----
-
-#### `/backlog`
-
-**O que faz:**
-1. Lê `Relatorios/Swarm/task-backlog.md` (cria se não existir)
-2. Mostra tasks abertas com status, prioridade e repo
-3. Pergunta o que o usuário quer fazer: adicionar, atualizar status ou listar
-4. Aplica a mudança mantendo o formato de tabela Markdown
-5. Atualiza `Relatorios/Swarm/supervisor-status.md` com total de tasks abertas e data
-
-**Formato da tabela:**
-```
-| Id | Repo | Titulo | Status | Prioridade | Origem |
-```
-
-**Status válidos:** `open`, `in-progress`, `blocked`, `done`, `cancelled`
-
-**Prioridades válidas:** `high`, `medium`, `low`
-
----
-
-#### `/daily-memory`
-
-**O que faz:**
-1. Verifica se `memory/YYYY-MM-DD.md` de hoje existe
-2. Se não existir, cria com cabeçalho `# YYYY-MM-DD`
-3. Pergunta o que deve ser registrado (ou usa o contexto da sessão)
-4. Registra fatos, decisões, riscos e links para artefatos
-5. Avalia se algum item merece promoção para `MEMORY.md`
-
-**Quando usar:** ao final de uma sessão ou quando houver eventos relevantes a registrar.
-
----
-
-### .claude/settings.json
-
-Define as permissões automáticas do Claude Code no workspace:
-
-```json
-{
-  "permissions": {
-    "allow": [
-      "Bash(git:*)",   // qualquer comando git
-      "Bash(ls:*)",    // listar diretórios
-      "Bash(cat:*)",   // ler arquivos via shell
-      "Read(*)",       // ler qualquer arquivo
-      "Write(*)",      // escrever qualquer arquivo
-      "Edit(*)",       // editar qualquer arquivo
-      "Glob(*)",       // busca por padrões de arquivo
-      "Grep(*)"        // busca por conteúdo
-    ],
-    "deny": []
-  },
-  "enabledPlugins": {
-    "telegram@claude-plugins-official": true  // plugin Telegram opcional
-  }
-}
-```
-
-As permissões são aprovadas automaticamente — o usuário não precisa confirmar cada operação de leitura/escrita local. O bloco `enabledPlugins` é opcional e habilita o plugin do Telegram para receber e responder mensagens via bot.
-
----
-
-### .gitignore
-
-Exclui do versionamento:
-
-```
-.claude/settings.local.json   # configurações locais pessoais
-secrets.local.json            # segredos locais
-Relatorios/                   # relatórios gerados
-Swarm/                        # status operacional gerado
-.wt/                          # worktrees temporários
-.DS_Store, Thumbs.db          # arquivos de sistema
+2. Ler memory/YYYY-MM-DD.md de ontem, se existir
+3. Ler .claude/settings.json
+4. Executar /heartbeat
 ```
 
 ---
 
-### claudeCode-repo/CLAUDE.md
+## Componentes
 
-Template para governar o comportamento do Claude **dentro de cada repositório individual**. É diferente do CLAUDE.md do workspace — ele é copiado para dentro de cada repo.
+### `CLAUDE.md` do workspace
 
-**O que define:**
+Define o contrato principal:
 
-- O que Claude deve fazer antes de alterar código (ler o arquivo, localizar comandos de validação, confirmar branch)
-- Regras mínimas de Git (não commitar sem instrução clara, não reverter trabalho alheio)
-- Placeholders para comandos de build/test/lint do repo específico
-- Onde ficam os relatórios: `__WORKSPACE_ROOT__/Relatorios/__REPO_NAME__/`
+1. importa arquivos de apoio
+2. define startup obrigatorio
+3. estabelece regras de seguranca
+4. orienta uso de MCPs
+5. padroniza worktrees
 
-**Placeholders a substituir ao usar:**
+### `SOUL.md`
 
-| Placeholder | O que colocar |
-|---|---|
-| `__REPO_NAME__` | Nome do repositório |
-| `__BUILD_COMMAND__` | Comando de build |
-| `__TEST_COMMAND__` | Comando de testes |
-| `__LINT_COMMAND__` | Comando de lint |
-| `__WORKSPACE_ROOT__` | Caminho absoluto do workspace |
+Guarda os principios permanentes do fluxo.
+
+### `USER.md`
+
+Guarda contexto operacional do time, sem segredos.
+
+### `TOOLS.md`
+
+Centraliza comandos por repo, caminhos importantes, MCPs e worktrees.
+
+### Memoria diaria - `memory/YYYY-MM-DD.md`
+
+Registra fatos, riscos e decisoes do dia.
+
+### Memoria duravel - `MEMORY.md`
+
+Guarda contratos e decisoes que precisam sobreviver entre sessoes.
+
+### `HEARTBEAT.md`
+
+Checklist curto de saude operacional, incluindo auditoria leve de worktrees.
 
 ---
 
-## Fluxo completo de uma sessão
+## Slash Commands
 
-```
-Sessão inicia
-    │
-    ▼
-Claude lê CLAUDE.md
-    │ importa automaticamente
-    ├── SOUL.md
-    ├── USER.md
-    ├── TOOLS.md
-    └── MEMORY.md
-    │
-    ▼
-Startup obrigatório
-    ├── Lê memory/hoje.md
-    ├── Lê memory/ontem.md (se existir)
-    └── Executa /heartbeat
-            ├── Verifica tasks bloqueadas
-            ├── Verifica relatórios vencidos
-            └── Responde HEARTBEAT_OK ou lista atenções
-    │
-    ▼
-Trabalho da sessão
-    ├── Código → task no /backlog ou sessão direta
-    ├── Decisões → /daily-memory
-    └── Respeita CLAUDE.md de cada repo
-    │
-    ▼
-Fim da sessão
-    └── /daily-memory → registra fatos e avalia promoções para MEMORY.md
+### `/heartbeat`
+
+Verifica estado operacional, bloqueios e sinais de worktrees com risco ou limpeza pendente.
+
+### `/backlog`
+
+Lista e atualiza tasks em `Relatorios/Swarm/task-backlog.md`.
+
+### `/daily-memory`
+
+Cria ou atualiza a memoria diaria e avalia promocao para `MEMORY.md`.
+
+---
+
+## `.claude/settings.json`
+
+Define permissoes locais e os MCPs/plugins habilitados no workspace.
+
+MCPs atuais:
+
+- `serena`
+- `context7`
+- `playwright`
+- `telegram`
+- `context-mode`
+
+---
+
+## `.gitignore`
+
+Ignora configuracoes locais, relatorios gerados, segredos locais e `.wt/`.
+
+---
+
+## `claudeCode-repo/CLAUDE.md`
+
+Template que governa o comportamento do Claude dentro de cada repositorio, com regras minimas, comandos de validacao e prioridade de ferramentas.
+
+---
+
+## Worktrees
+
+Worktrees sao o mecanismo padrao para isolamento e paralelo limpo.
+
+Convencao:
+
+- raiz em `.wt/`
+- padrao `.wt/<repo>/<objetivo-ou-branch>`
+
+Regras:
+
+- auditar antes de criar nova worktree
+- verificar reaproveitamento antes de abrir outra
+- pedir confirmacao antes de remover
+
+---
+
+## Fluxo completo de uma sessao
+
+```text
+Sessao inicia
+ -> Claude le CLAUDE.md
+ -> le memoria
+ -> le settings.json
+ -> executa /heartbeat
+ -> trabalha respeitando o contrato do workspace e dos repos
+ -> registra fatos em /daily-memory
 ```
 
 ---
 
 ## Onde os dados ficam
 
-| Dado | Localização |
+| Dado | Localizacao |
 |---|---|
-| Memória do dia | `memory/YYYY-MM-DD.md` |
-| Memória durável | `MEMORY.md` |
+| Memoria do dia | `memory/YYYY-MM-DD.md` |
+| Memoria duravel | `MEMORY.md` |
 | Ferramentas e comandos | `TOOLS.md` |
-| Backlog de tasks | `Relatorios/Swarm/task-backlog.md` |
-| Status do supervisor | `Relatorios/Swarm/supervisor-status.md` |
-| Relatórios por repo | `Relatorios/__REPO_NAME__/` |
-| Configurações pessoais | `.claude/settings.local.json` (não versionado) |
+| Backlog | `Relatorios/Swarm/task-backlog.md` |
+| Status operacional | `Relatorios/Swarm/supervisor-status.md` |
+| Relatorios por repo | `Relatorios/__REPO_NAME__/` |
+| Config local | `.claude/settings.local.json` |
+| Worktrees | `.wt/` |
 
 ---
 
 ## Como usar o pack
 
-1. Copiar `claudeCode-workspace/` para o diretório raiz do seu workspace
-2. Preencher `USER.md` com o contexto do time
-3. Preencher `TOOLS.md` com os comandos de cada repo
-4. Para cada repositório de código: copiar `claudeCode-repo/CLAUDE.md` para dentro do repo e substituir os placeholders
-5. Substituir `__WORKSPACE_ROOT__` no `CLAUDE.md` do workspace pelo caminho real
-6. Abrir o Claude Code no workspace — ele já encontra o `CLAUDE.md` e inicia o fluxo automaticamente
+1. Copie `claudeCode-workspace/` para seu workspace.
+2. Preencha `USER.md` e `TOOLS.md`.
+3. Copie `claudeCode-repo/CLAUDE.md` para cada repo e substitua os placeholders.
+4. Ajuste `__WORKSPACE_ROOT__`.
+5. Revise `.claude/settings.json`.
+6. Abra o Claude Code no workspace.
 
 ---
 
 ## Plugins MCP
 
-Extensões que ampliam o que o Claude Code consegue fazer. Habilitados em `.claude/settings.json`:
+MCPs/plugins habilitados em `.claude/settings.json`:
 
 ```json
 "enabledPlugins": {
   "context7@claude-plugins-official": true,
   "serena@claude-plugins-official": true,
   "playwright@claude-plugins-official": true,
-  "telegram@claude-plugins-official": true
+  "telegram@claude-plugins-official": true,
+  "context-mode@context-mode": true
 }
 ```
 
-| Plugin | O que faz | Dependência |
-|---|---|---|
-| `context7` | Busca documentação atualizada de bibliotecas | Nenhuma |
-| `serena` | Lê e edita código com entendimento semântico (funções, classes) | Nenhuma |
-| `playwright` | Controla browser: navega, screenshot, preenche formulários | Node.js 18+ (`npx playwright install`) |
-| `telegram` | Canal de mensagens via bot do Telegram | Bot criado no @BotFather + `/telegram:configure` |
+Uso rapido:
 
-**Telegram — configuração rápida:**
-1. Crie um bot no @BotFather e copie o token
-2. Execute `/telegram:configure` no Claude Code e cole o token
-3. Envie uma mensagem ao bot e execute `/telegram:access` para aprovar o pareamento
+- `serena` para codigo
+- `context7` para documentacao externa
+- `playwright` para UI/browser
+- `context-mode` para tarefas longas
+- `telegram` para interacao remota

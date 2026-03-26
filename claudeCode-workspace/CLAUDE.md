@@ -98,6 +98,26 @@ Perguntar antes:
 - sempre respeitar `CLAUDE.md` local de cada repositorio
 - quando houver MCP compativel com a tarefa, preferir o MCP adequado antes de depender so de shell e leitura linear
 
+## Worktrees
+
+Worktrees sao o mecanismo padrao para paralelo limpo, auditoria rastreavel e isolamento de contexto.
+
+Regras:
+
+- worktrees operacionais devem viver em `.wt/`
+- usar o padrao `.wt/<repo>/<objetivo-ou-branch>` para manter auditoria simples
+- cada worktree deve ter um objetivo claro, uma branch associada e um dono ou task rastreavel
+- antes de criar nova worktree, auditar o estado atual com `git worktree list --porcelain`
+- ao iniciar ou retomar uma task, verificar se ja existe worktree adequada antes de abrir outra
+- ao encerrar uma task, avaliar se a worktree deve ser mantida, arquivada em artefato ou removida
+
+Auto-gestao:
+
+- Claude pode auditar worktrees sem perguntar: listar, inspecionar status, conferir branch e identificar worktrees orfas, sujas ou sem objetivo claro
+- Claude deve registrar risco operacional quando encontrar worktree abandonada, branch inexistente, metadata inconsistente ou mudanca sem task associada
+- Claude deve propor limpeza quando houver worktree limpa, mesclada ou sem uso, mas deve pedir confirmacao antes de remover
+- Claude deve preferir `git worktree prune` para limpar metadata orfa e `git worktree remove` apenas para worktrees elegiveis e confirmadas
+
 ## Git
 
 - nao commitar em branch protegida sem instrucao clara

@@ -36,12 +36,46 @@ Fonte canonica: `.claude/settings.json`
 - memoria diaria: `memory/`
 - memoria duravel: `MEMORY.md`
 - contrato operacional: `CLAUDE.md`
+- worktrees locais: `.wt/`
+
+## Worktrees
+
+Convencao:
+
+- raiz local: `.wt/`
+- padrao de caminho: `.wt/<repo>/<objetivo-ou-branch>`
+- uma worktree por contexto ativo relevante
+
+Auditoria:
+
+- listar worktrees: `git worktree list --porcelain`
+- verificar status de uma worktree: `git -C .wt/<repo>/<objetivo-ou-branch> status --short --branch`
+- podar metadata orfa: `git worktree prune`
+
+Criacao:
+
+- nova branch em worktree dedicada: `git worktree add .wt/<repo>/<objetivo-ou-branch> -b <branch>`
+- usar branch existente em worktree dedicada: `git worktree add .wt/<repo>/<objetivo-ou-branch> <branch>`
+
+Limpeza:
+
+- remover worktree limpa: `git worktree remove .wt/<repo>/<objetivo-ou-branch>`
+- nunca remover worktree com mudancas nao commitadas sem confirmar antes
+
+Inventario minimo por worktree:
+
+- repo
+- branch
+- objetivo
+- dono ou task
+- data da ultima atividade
 
 Formato sugerido:
 
 ## Repo `__REPO_NAME__`
 
 - path: `__ABSOLUTE_OR_RELATIVE_PATH__`
+- worktree-root: `.wt/__REPO_NAME__/`
 - build: `__COMMAND__`
 - test: `__COMMAND__`
 - lint: `__COMMAND__`
