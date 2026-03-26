@@ -18,16 +18,3 @@ Formato sugerido:
 - publish: `__COMMAND__`
 
 ---
-
-## Repo `RepassesWebExterno`
-
-- caminho: `C:/Sistema/RepassesWebExterno`
-- dev: `npm run dev`
-- build (padrao): `npm run build`
-- build PMS: `npm run build_pms`
-- build PMV: `npm run build_pmv`
-- build PMColatina: `npm run build_pmcolatina`
-- lint: nao configurado
-- test: nao configurado
-- stack: Vue 3 + TypeScript + Vite + PrimeVue
-- deploy: Azure DevOps (azure-pipelines.yml), trigger na branch master
