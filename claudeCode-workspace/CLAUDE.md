@@ -2,6 +2,7 @@
 
 Este arquivo e a fonte de verdade operacional do workspace para o Claude Code.
 Ele importa os arquivos auxiliares abaixo automaticamente em cada sessao.
+A fonte canonica dos MCPs/plugins habilitados neste workspace e `.claude/settings.json`.
 
 @SOUL.md
 @USER.md
@@ -13,8 +14,9 @@ Ele importa os arquivos auxiliares abaixo automaticamente em cada sessao.
 No inicio de cada sessao principal:
 
 1. Ler `memory/YYYY-MM-DD.md` de hoje e, se existir, o de ontem
-2. Executar `/heartbeat` para verificar o estado operacional
-3. Nao assumir contexto de sessao anterior sem verificar memoria
+2. Ler `.claude/settings.json` para confirmar MCPs/plugins habilitados
+3. Executar `/heartbeat` para verificar o estado operacional
+4. Nao assumir contexto de sessao anterior sem verificar memoria
 
 ## Objetivo
 
@@ -36,6 +38,31 @@ Aqui vivem:
 - `memory/YYYY-MM-DD.md` — memoria diaria
 - `Relatorios/` — artefatos humanos por repo e por job
 - `Swarm/` — espelhos curtos de status operacional
+
+## Uso de MCPs
+
+MCPs/plugins ativos neste workspace devem ser tratados como ferramentas de primeira linha, nao como opcional tardio.
+
+Fonte canonica:
+
+- `.claude/settings.json` define o conjunto de MCPs/plugins habilitados nesta instalacao
+
+Prioridade por tipo de tarefa:
+
+- `serena` para entender estrutura de codigo, localizar simbolos, navegar entre arquivos e editar com contexto semantico
+- `context7` para documentacao atualizada de bibliotecas, frameworks, SDKs e APIs externas
+- `playwright` para fluxos de browser, reproduzir bugs visuais, tirar screenshot e validar comportamento de UI
+- `context-mode` para organizar contexto longo, manter continuidade e reduzir perda de estado entre tarefas grandes
+- `telegram` apenas quando houver pareamento configurado e a tarefa envolver mensagens, notificacoes ou triagem remota
+
+Regras operacionais:
+
+- em tarefa de codigo dentro de repo conhecido, preferir `serena` antes de busca manual por texto quando o objetivo for entender simbolos, referencias ou pontos de entrada
+- em tarefa que depende de API externa, pacote ou framework, consultar `context7` antes de assumir contrato ou comportamento
+- em tarefa de interface, navegacao ou regressao visual, validar com `playwright` sempre que o fluxo puder ser exercido localmente
+- em tarefa longa, com multiplos arquivos, varias etapas ou historico extenso, usar `context-mode` para manter continuidade e reduzir perda de contexto entre iteracoes
+- se um MCP relevante estiver indisponivel, registrar o fallback usado no artefato final ou na memoria do dia quando isso afetar a qualidade da execucao
+- nao inventar uso de MCP: escolher a ferramenta pelo tipo de evidencia necessaria
 
 ## Memoria
 
@@ -69,6 +96,7 @@ Perguntar antes:
 - mudanca de codigo em repo conhecido deve virar task do backlog ou sessao direta, conforme politica do time
 - nao improvisar fora do contrato operacional
 - sempre respeitar `CLAUDE.md` local de cada repositorio
+- quando houver MCP compativel com a tarefa, preferir o MCP adequado antes de depender so de shell e leitura linear
 
 ## Git
 
