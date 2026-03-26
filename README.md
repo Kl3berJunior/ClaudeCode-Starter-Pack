@@ -6,8 +6,8 @@ Um template de workspace profissional para o **Claude Code** (CLI da Anthropic).
 
 O pack tem duas partes independentes:
 
-- `claude-code-workspace/` — o workspace principal onde Claude opera
-- `claude-code-repo/` — o template que vai dentro de cada repositório de código
+- `claudeCode-workspace/` — o workspace principal onde Claude opera
+- `claudeCode-repo/` — o template que vai dentro de cada repositório de código
 
 ---
 
@@ -15,9 +15,9 @@ O pack tem duas partes independentes:
 
 ```
 ClaudeCode-Stater-Pack/
-├── claude-code-repo/
+├── claudeCode-repo/
 │   └── CLAUDE.md                        # Template por repositório
-└── claude-code-workspace/
+└── claudeCode-workspace/
     ├── .claude/
     │   ├── settings.json                # Permissões do Claude Code
     │   └── commands/
@@ -223,11 +223,14 @@ Define as permissões automáticas do Claude Code no workspace:
       "Grep(*)"        // busca por conteúdo
     ],
     "deny": []
+  },
+  "enabledPlugins": {
+    "telegram@claude-plugins-official": true  // plugin Telegram opcional
   }
 }
 ```
 
-Essas permissões são aprovadas automaticamente — o usuário não precisa confirmar cada operação de leitura/escrita local.
+As permissões são aprovadas automaticamente — o usuário não precisa confirmar cada operação de leitura/escrita local. O bloco `enabledPlugins` é opcional e habilita o plugin do Telegram para receber e responder mensagens via bot.
 
 ---
 
@@ -246,7 +249,7 @@ Swarm/                        # status operacional gerado
 
 ---
 
-### claude-code-repo/CLAUDE.md
+### claudeCode-repo/CLAUDE.md
 
 Template para governar o comportamento do Claude **dentro de cada repositório individual**. É diferente do CLAUDE.md do workspace — ele é copiado para dentro de cada repo.
 
@@ -320,9 +323,9 @@ Fim da sessão
 
 ## Como usar o pack
 
-1. Copiar `claude-code-workspace/` para o diretório raiz do seu workspace
+1. Copiar `claudeCode-workspace/` para o diretório raiz do seu workspace
 2. Preencher `USER.md` com o contexto do time
 3. Preencher `TOOLS.md` com os comandos de cada repo
-4. Para cada repositório de código: copiar `claude-code-repo/CLAUDE.md` para dentro do repo e substituir os placeholders
+4. Para cada repositório de código: copiar `claudeCode-repo/CLAUDE.md` para dentro do repo e substituir os placeholders
 5. Substituir `__WORKSPACE_ROOT__` no `CLAUDE.md` do workspace pelo caminho real
 6. Abrir o Claude Code no workspace — ele já encontra o `CLAUDE.md` e inicia o fluxo automaticamente
