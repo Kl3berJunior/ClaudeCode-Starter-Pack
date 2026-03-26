@@ -1,15 +1,18 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(git:*)",
-      "Bash(ls:*)",
-      "Bash(cat:*)",
-      "Read(*)",
-      "Write(*)",
-      "Edit(*)",
-      "Glob(*)",
-      "Grep(*)"
-    ],
-    "deny": []
-  }
+    "permissions": {
+        "allow": [
+            "Bash(git:*)",
+            "Bash(ls:*)",
+            "Bash(cat:*)",
+            "Read(*)",
+            "Write(*)",
+            "Edit(*)",
+            "Glob(*)",
+            "Grep(*)"
+        ],
+        "deny": []
+    },
+    "enabledPlugins": {
+        "telegram@claude-plugins-official": true
+    }
 }
