@@ -1,6 +1,6 @@
 # Segredos locais
-.local
-
+.claude/settings.local.json
+secrets.local.json
 
 # Estado e logs operacionais locais
 Relatorios/
@@ -8,6 +8,9 @@ Swarm/
 
 # Worktrees temporarias
 .wt/
+
+# Serena MCP (estado local)
+.serena/memories/
 
 # Arquivos de sistema
 
