@@ -329,3 +329,30 @@ Fim da sessão
 4. Para cada repositório de código: copiar `claudeCode-repo/CLAUDE.md` para dentro do repo e substituir os placeholders
 5. Substituir `__WORKSPACE_ROOT__` no `CLAUDE.md` do workspace pelo caminho real
 6. Abrir o Claude Code no workspace — ele já encontra o `CLAUDE.md` e inicia o fluxo automaticamente
+
+---
+
+## Plugins MCP
+
+Extensões que ampliam o que o Claude Code consegue fazer. Habilitados em `.claude/settings.json`:
+
+```json
+"enabledPlugins": {
+  "context7@claude-plugins-official": true,
+  "serena@claude-plugins-official": true,
+  "playwright@claude-plugins-official": true,
+  "telegram@claude-plugins-official": true
+}
+```
+
+| Plugin | O que faz | Dependência |
+|---|---|---|
+| `context7` | Busca documentação atualizada de bibliotecas | Nenhuma |
+| `serena` | Lê e edita código com entendimento semântico (funções, classes) | Nenhuma |
+| `playwright` | Controla browser: navega, screenshot, preenche formulários | Node.js 18+ (`npx playwright install`) |
+| `telegram` | Canal de mensagens via bot do Telegram | Bot criado no @BotFather + `/telegram:configure` |
+
+**Telegram — configuração rápida:**
+1. Crie um bot no @BotFather e copie o token
+2. Execute `/telegram:configure` no Claude Code e cole o token
+3. Envie uma mensagem ao bot e execute `/telegram:access` para aprovar o pareamento

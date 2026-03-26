@@ -1,6 +1,6 @@
 # Segredos locais
-.claude/settings.local.json
-secrets.local.json
+.local
+
 
 # Estado e logs operacionais locais
 Relatorios/
@@ -10,5 +10,4 @@ Swarm/
 .wt/
 
 # Arquivos de sistema
-.DS_Store
-Thumbs.db
+
