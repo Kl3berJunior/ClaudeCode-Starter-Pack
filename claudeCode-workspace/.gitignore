@@ -11,5 +11,6 @@ Swarm/
 # Serena MCP (estado local)
 .serena/memories/
 
-# Arquivos de sistema
+# Repositorios
+repo/*/
 

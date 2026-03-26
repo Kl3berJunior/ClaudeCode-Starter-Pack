@@ -31,6 +31,7 @@ Fonte canonica: `.claude/settings.json`
 ## Caminhos importantes
 
 - workspace root: `__WORKSPACE_ROOT__`
+- repositorios de codigo: `__WORKSPACE_ROOT__/repo/`
 - configuracao Claude Code: `.claude/settings.json`
 - comandos customizados: `.claude/commands/`
 - memoria diaria: `memory/`
@@ -74,7 +75,7 @@ Formato sugerido:
 
 ## Repo `__REPO_NAME__`
 
-- path: `__ABSOLUTE_OR_RELATIVE_PATH__`
+- path: `__WORKSPACE_ROOT__/repo/__REPO_NAME__`
 - worktree-root: `.wt/__REPO_NAME__/`
 - build: `__COMMAND__`
 - test: `__COMMAND__`

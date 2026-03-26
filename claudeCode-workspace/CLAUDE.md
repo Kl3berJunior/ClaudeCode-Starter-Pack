@@ -26,7 +26,7 @@ Aqui vivem:
 - memoria diaria e duravel
 - configuracao canonica do fluxo
 - relatorios e espelhos operacionais
-- repositorios principais de codigo
+- repositorios principais de codigo dentro de `repo/`
 
 ## Arquivos principais
 
@@ -38,6 +38,7 @@ Aqui vivem:
 - `memory/YYYY-MM-DD.md` — memoria diaria
 - `Relatorios/` — artefatos humanos por repo e por job
 - `Swarm/` — espelhos curtos de status operacional
+- `repo/` — repositorios de codigo governados por este workspace
 
 ## Uso de MCPs
 

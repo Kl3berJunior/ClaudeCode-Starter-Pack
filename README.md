@@ -7,7 +7,7 @@ Template de workspace para Claude Code com contrato operacional, memoria, MCPs e
 O pack tem duas partes:
 
 - `claudeCode-workspace/` - workspace principal
-- `claudeCode-repo/` - template para cada repositorio
+- `claudeCode-workspace/repo/CLAUDE.md` - template para cada repositorio
 
 ---
 
@@ -15,8 +15,6 @@ O pack tem duas partes:
 
 ```text
 ClaudeCode-Stater-Pack/
-|-- claudeCode-repo/
-|   `-- CLAUDE.md                    # Template para copiar para dentro de cada repo de codigo
 `-- claudeCode-workspace/
     |-- .claude/
     |   |-- settings.json            # Permissoes locais e MCPs/plugins habilitados
@@ -36,6 +34,8 @@ ClaudeCode-Stater-Pack/
     |   `-- project.local.yml        # Ajustes locais do Serena, quando usados
     |-- memory/
     |   `-- README.md                # Instrucao curta sobre memoria diaria
+    |-- repo/
+    |   `-- CLAUDE.md                # Template para copiar para dentro de cada repo de codigo
     |-- .gitignore
     |-- CLAUDE.md                    # Contrato operacional principal do workspace
     |-- HEARTBEAT.md                 # Checklist curto de saude operacional
@@ -162,7 +162,7 @@ Ignora configuracoes locais, relatorios gerados, segredos locais e `.wt/`.
 
 ---
 
-## `claudeCode-repo/CLAUDE.md`
+## `claudeCode-workspace/repo/CLAUDE.md`
 
 Template que governa o comportamento do Claude dentro de cada repositorio, com regras minimas, comandos de validacao e prioridade de ferramentas.
 
@@ -211,6 +211,7 @@ Sessao inicia
 | Relatorios por repo | `Relatorios/__REPO_NAME__/` |
 | Config local | `.claude/settings.local.json` |
 | Worktrees | `.wt/` |
+| Repositorios de codigo | `repo/__REPO_NAME__/` |
 
 ---
 
@@ -218,7 +219,7 @@ Sessao inicia
 
 1. Copie `claudeCode-workspace/` para seu workspace.
 2. Preencha `USER.md` e `TOOLS.md`.
-3. Copie `claudeCode-repo/CLAUDE.md` para cada repo e substitua os placeholders.
+3. Coloque seus repositorios dentro de `repo/` no workspace, copie `claudeCode-workspace/repo/CLAUDE.md` para cada repo e substitua os placeholders.
 4. Ajuste `__WORKSPACE_ROOT__`.
 5. Revise `.claude/settings.json`.
 6. Abra o Claude Code no workspace.

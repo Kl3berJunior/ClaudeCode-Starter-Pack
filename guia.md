@@ -7,7 +7,7 @@ Este guia explica como pegar este starter pack, transformar isso em um workspace
 O pack organiza o uso do Claude Code em dois niveis:
 
 - `claudeCode-workspace/`: o workspace principal, com memoria, comandos customizados, configuracao local e contrato operacional.
-- `claudeCode-repo/`: um template de `CLAUDE.md` para colocar dentro de cada repositorio de codigo.
+- `claudeCode-workspace/repo/CLAUDE.md`: o template de `CLAUDE.md` para copiar para dentro de cada repositorio de codigo.
 
 Na pratica, ele resolve estes problemas:
 
@@ -26,12 +26,12 @@ Na pratica, ele resolve estes problemas:
 ClaudeCode-Starter-Pack/
 |-- README.md
 |-- guia.md
-|-- claudeCode-repo/
-|   `-- CLAUDE.md
 `-- claudeCode-workspace/
     |-- .claude/
     |-- .serena/
     |-- memory/
+    |-- repo/
+    |   `-- CLAUDE.md
     |-- .gitignore
     |-- CLAUDE.md
     |-- HEARTBEAT.md
@@ -56,7 +56,7 @@ ClaudeCode-Starter-Pack/
 | `claudeCode-workspace/.claude/commands/` | Slash commands do workspace. |
 | `claudeCode-workspace/.claude/agents/` | Subagentes especializados. |
 | `claudeCode-workspace/.serena/` | Configuracao local do Serena para navegacao semantica. |
-| `claudeCode-repo/CLAUDE.md` | Template para o contrato local de cada repo de codigo. |
+| `claudeCode-workspace/repo/CLAUDE.md` | Template para o contrato local de cada repo de codigo. |
 
 ## 3. Antes de comecar
 
@@ -97,8 +97,9 @@ C:\Work\MeuWorkspace\
 |-- SOUL.md
 |-- TOOLS.md
 |-- USER.md
-|-- api\
-`-- web\
+`-- repo\
+    |-- api\
+    `-- web\
 ```
 
 ### Passo 2. Copie `claudeCode-workspace/` para a raiz escolhida
@@ -113,28 +114,31 @@ robocopy .\claudeCode-workspace C:\Work\MeuWorkspace /E
 
 Observe que o importante e preservar tambem as pastas ocultas, como `.claude/` e `.serena/`.
 
-### Passo 3. Coloque seus repositorios de codigo dentro do workspace
+### Passo 3. Coloque seus repositorios de codigo dentro da pasta `repo`
 
-O contrato do pack assume que os repos principais ficam visiveis dentro da raiz do workspace. Eles podem estar diretamente na raiz ou em uma subpasta definida por voce, desde que isso fique documentado em `TOOLS.md`.
+O contrato recomendado deste pack assume que os repos principais ficam dentro de uma pasta `repo/` na raiz do workspace. Isso deixa a estrutura mais previsivel, facilita documentacao em `TOOLS.md` e evita misturar arquivos operacionais do workspace com codigo de produto.
 
 Exemplo:
 
 ```text
 C:\Work\MeuWorkspace\
-|-- api\
-|-- web\
-`-- mobile\
+`-- repo\
+    |-- api\
+    |-- web\
+    `-- mobile\
 ```
+
+Se voce adotar outro caminho, registre isso explicitamente em `TOOLS.md`. Mas o padrao sugerido por este guia e `repo/<nome-do-repo>`.
 
 ### Passo 4. Copie o template de repo para cada repositorio
 
-Para cada repositorio de codigo, copie `claudeCode-repo/CLAUDE.md` para a raiz do repo correspondente.
+Para cada repositorio de codigo, copie `claudeCode-workspace/repo/CLAUDE.md` para a raiz do repo correspondente.
 
 Exemplo:
 
 ```text
-C:\Work\MeuWorkspace\api\CLAUDE.md
-C:\Work\MeuWorkspace\web\CLAUDE.md
+C:\Work\MeuWorkspace\repo\api\CLAUDE.md
+C:\Work\MeuWorkspace\repo\web\CLAUDE.md
 ```
 
 Esse arquivo e o contrato local do repo. O Claude deve respeita-lo sempre que estiver trabalhando naquele repositorio.
@@ -201,7 +205,7 @@ O proprio arquivo ja sugere um formato por repositorio:
 ```md
 ## Repo `api`
 
-- path: `C:/Work/MeuWorkspace/api`
+- path: `C:/Work/MeuWorkspace/repo/api`
 - worktree-root: `.wt/api/`
 - build: `npm run build`
 - test: `npm test`
@@ -620,7 +624,7 @@ Um uso tipico pode ser assim:
 3. Rodar `/heartbeat`.
 4. Escolher o repo `api`.
 5. Se necessario, abrir `.wt/api/feat-ajuste-login`.
-6. Trabalhar respeitando `api/CLAUDE.md`.
+6. Trabalhar respeitando `repo/api/CLAUDE.md`.
 7. Rodar build, test e lint do repo.
 8. Atualizar `/daily-memory`.
 9. Promover alguma decisao duravel para `MEMORY.md`.
@@ -631,7 +635,7 @@ Um uso tipico pode ser assim:
 Se voce quiser simplificar a adocao, pense assim:
 
 - `claudeCode-workspace/` vira a raiz operacional do seu workspace
-- `claudeCode-repo/CLAUDE.md` vai para cada repo de codigo
+- `claudeCode-workspace/repo/CLAUDE.md` vai para cada repo de codigo dentro de `repo/`
 - `CLAUDE.md` dita o comportamento
 - `memory/` registra o dia
 - `MEMORY.md` guarda o que fica

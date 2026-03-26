@@ -41,4 +41,4 @@ Objetivo: reduzir leitura cega, aumentar validacao e usar a ferramenta certa par
 
 Artefatos deste repo vivem em:
 
-- `__WORKSPACE_ROOT__/claudeCode-workspace/Relatorios/__REPO_NAME__/`
+- `__WORKSPACE_ROOT__/Relatorios/__REPO_NAME__/`
