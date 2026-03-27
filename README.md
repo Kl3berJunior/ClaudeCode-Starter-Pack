@@ -153,6 +153,7 @@ MCPs atuais:
 - `playwright`
 - `telegram`
 - `context-mode`
+- `commit-commands`
 
 ---
 
@@ -208,6 +209,7 @@ Sessao inicia
 | Ferramentas e comandos | `TOOLS.md` |
 | Backlog | `Relatorios/Swarm/task-backlog.md` |
 | Status operacional | `Relatorios/Swarm/supervisor-status.md` |
+| Sessoes de agente | `Relatorios/agent-sessions/YYYY-MM-DD-session.md` |
 | Relatorios por repo | `Relatorios/__REPO_NAME__/` |
 | Config local | `.claude/settings.local.json` |
 | Worktrees | `.wt/` |
@@ -236,7 +238,8 @@ MCPs/plugins habilitados em `.claude/settings.json`:
   "serena@claude-plugins-official": true,
   "playwright@claude-plugins-official": true,
   "telegram@claude-plugins-official": true,
-  "context-mode@context-mode": true
+  "context-mode@context-mode": true,
+  "commit-commands@claude-plugins-official": true
 }
 ```
 
@@ -247,3 +250,4 @@ Uso rapido:
 - `playwright` para UI/browser
 - `context-mode` para tarefas longas
 - `telegram` para interacao remota
+- `commit-commands` para commits, push e PRs via slash commands

@@ -17,6 +17,7 @@
     "serena@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
-    "context-mode@context-mode": true
+    "context-mode@context-mode": true,
+    "commit-commands@claude-plugins-official": true
   }
 }

@@ -144,9 +144,37 @@ Agentes disponiveis em `.claude/agents/`:
 
 ## Git
 
-- nao commitar em branch protegida sem instrucao clara
-- rodar validacao relevante antes de concluir
+Fluxo obrigatorio ao fazer alteracoes em codigo:
+
+1. Verificar se o branch atual esta limpo (sem mudancas nao commitadas). Se nao estiver, parar e confirmar com o usuario antes de continuar.
+2. Criar um novo branch antes de editar qualquer arquivo:
+   ```
+   git checkout -b agent/<nome-curto-da-tarefa>
+   ```
+3. Nunca commitar diretamente em `main` ou `master`.
+4. Usar mensagens de commit no formato convencional:
+   - `feat: ...`
+   - `fix: ...`
+   - `refactor: ...`
+   - `chore: ...`
+5. Antes de concluir: rodar testes, linters e garantir que o projeto compila.
+
+Regras adicionais:
+
 - nao reverter trabalho alheio
+- nao usar `--no-verify` ou `--force-push` sem instrucao explicita
+
+## Encerramento de sessao
+
+Ao finalizar cada sessao ou execucao de agente:
+
+1. Atualizar a memoria diaria com `/daily-memory`.
+2. Salvar resumo da sessao em `Relatorios/agent-sessions/YYYY-MM-DD-session.md` com:
+   - objetivo
+   - arquivos alterados
+   - comandos executados
+3. Avaliar se alguma decisao duravel deve subir para `MEMORY.md`.
+4. Verificar worktrees elegiveis para limpeza.
 
 ## Regra final
 
