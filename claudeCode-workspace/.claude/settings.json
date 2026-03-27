@@ -1,21 +1,37 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(git:*)",
-      "Read(*)",
-      "Write(*)",
-      "Edit(*)",
-      "Glob(*)",
-      "Grep(*)"
-    ],
-    "deny": []
-  },
-  "enabledPlugins": {
-    "telegram@claude-plugins-official": true,
-    "serena@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true,
-    "context7@claude-plugins-official": true,
-    "context-mode@context-mode": true,
-    "commit-commands@claude-plugins-official": true
-  }
+    "permissions": {
+        "allow": [
+            "Bash(git:*)",
+            "Read(*)",
+            "Write(*)",
+            "Edit(*)",
+            "Glob(*)",
+            "Grep(*)"
+        ],
+        "deny": []
+    },
+    "pluginConfigs": {
+        "serena@claude-plugins-official": {
+            "mcpServers": {
+                "serena": {
+                    "args": [
+                        "--from",
+                        "git+https://github.com/oraios/serena",
+                        "serena",
+                        "start-mcp-server",
+                        "--project-path",
+                        "C:/Sistema/claudeCode-workspace"
+                    ]
+                }
+            }
+        }
+    },
+    "enabledPlugins": {
+        "telegram@claude-plugins-official": true,
+        "serena@claude-plugins-official": true,
+        "playwright@claude-plugins-official": true,
+        "context7@claude-plugins-official": true,
+        "context-mode@context-mode": true,
+        "commit-commands@claude-plugins-official": true
+    }
 }

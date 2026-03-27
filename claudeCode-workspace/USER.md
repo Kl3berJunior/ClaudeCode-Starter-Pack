@@ -2,7 +2,7 @@
 
 Contexto operacional do time para guiar o comportamento do agente.
 
-Não colocar aqui segredos, tokens ou senhas.
+Nao colocar aqui segredos, tokens ou senhas.
 
 ## Time e ambiente
 
@@ -14,37 +14,53 @@ Não colocar aqui segredos, tokens ou senhas.
 
 ## Fluxo de trabalho
 
-- todo trabalho de código via branch dedicada com prefixo convencional:
-  - `feat/<objetivo>` — nova funcionalidade
-  - `fix/<objetivo>` — correcao de bug
-  - `chore/<objetivo>` — manutencao, configuracao, infraestrutura
-  - `refactor/<objetivo>` — refatoracao sem mudanca de comportamento
-  - `docs/<objetivo>` — documentacao
-- PRs obrigatórias antes de mergear em `main`
-- review explícita do usuário obrigatória antes do merge — o agente não mergea sem instrução direta
+- todo trabalho de codigo via branch dedicada com prefixo convencional:
+  - `feat/<objetivo>` - nova funcionalidade
+  - `fix/<objetivo>` - correcao de bug
+  - `chore/<objetivo>` - manutencao, configuracao, infraestrutura
+  - `refactor/<objetivo>` - refatoracao sem mudanca de comportamento
+  - `docs/<objetivo>` - documentacao
+- PRs obrigatorias antes de mergear em `main`
+- review explicita do usuario obrigatoria antes do merge - o agente nao mergea sem instrucao direta
 - mensagens de commit no formato convencional: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`
-- após merge: deletar branch local e remoto, rodar `git remote prune origin`
-- GitHub configurado com `delete_branch_on_merge=true` — branch remoto apagado automaticamente
+- apos merge: deletar branch local e remoto, rodar `git remote prune origin`
+- GitHub configurado com `delete_branch_on_merge=true` - branch remoto apagado automaticamente
 
-## Política de worktrees
+## Politica de worktrees
 
-- raiz padrão: `.wt/`
-- convenção de nome: `.wt/<repo-em-kebab-case>/<objetivo>`
-- abrir nova worktree quando houver tarefa paralela ou isolamento de contexto necessário
-- auditar worktrees no heartbeat de cada sessão
-- nunca remover worktree com mudanças não commitadas sem confirmar antes
-- limpeza autorizada pelo usuário ou quando a worktree estiver limpa e mergeada
+- raiz padrao: `.wt/`
+- convencao de nome: `.wt/<repo-em-kebab-case>/<objetivo>`
+- abrir nova worktree quando houver tarefa paralela ou isolamento de contexto necessario
+- auditar worktrees no heartbeat de cada sessao
+- nunca remover worktree com mudancas nao commitadas sem confirmar antes
+- limpeza autorizada pelo usuario ou quando a worktree estiver limpa e mergeada
 
 ## Testes
 
 - testes de API: PowerShell (`pwsh`) em `tests/<repo>/<modulo>/`
 - testes de frontend: Playwright (TypeScript) em `tests/<repo>/<modulo>/`
-- diretórios criados sob demanda — não criar estrutura vazia antecipadamente
+- diretorios criados sob demanda - nao criar estrutura vazia antecipadamente
 - todo fix com impacto visual deve ter teste de API e teste Playwright correspondente
 
-## Preferências do agente
+## GitHub
+
+- gh-username: `__GH_USERNAME__`
+
+### Organizacoes e Projetos
+
+Liste todas as orgs e projetos aos quais voce tem acesso.
+Formato: uma entrada por org, com seus projetos listados abaixo.
+
+```
+### Org `__GH_ORG_NAME__`
+- login: __GH_ORG_LOGIN__
+- projetos:
+  - number: __GH_PROJECT_NUMBER__ | title: __GH_PROJECT_TITLE__ | descricao: __GH_PROJECT_DESC__
+```
+
+## Preferencias do agente
 
 - responder de forma concisa e direta
-- tarefas independentes em paralelo sempre que possível
-- não criar arquivos desnecessários (README, docs) salvo quando solicitado
-- não mergear PR sem aprovação explícita do usuário
+- tarefas independentes em paralelo sempre que possivel
+- nao criar arquivos desnecessarios (README, docs) salvo quando solicitado
+- nao mergear PR sem aprovacao explicita do usuario

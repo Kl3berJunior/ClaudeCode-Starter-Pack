@@ -9,12 +9,15 @@ Passos:
    - Existe relatorio de sessao em `Relatorios/agent-sessions/` com data vencida sem conclusao?
 4. Verificar memoria do dia:
    - Existe `memory/YYYY-MM-DD.md` para hoje? (substitua pela data real)
-5. Auditar worktrees com `git worktree list --porcelain`:
-   - Existe worktree sem branch valida (branch inexistente ou HEAD detached)?
-   - Existe worktree com mudancas locais sem task ou dono rastreavel? (verificar com `git -C <path> status --short`)
-   - Existe worktree limpa, mergeada ou sem uso que pode ser removida?
-   - Para repos internos em `repo/`, auditar tambem com `git -C repo/<nome> worktree list`
-6. Reportar o estado completo:
+5. Auditar worktrees do workspace:
+   - Executar `git worktree list --porcelain`
+   - Existe worktree orfa, sem branch valida, HEAD detached ou sem objetivo claro?
+   - Existe worktree com mudancas locais sem task rastreavel? (verificar com `git -C <path> status --short`)
+   - Existe worktree limpa, mergeada ou encerrada elegivel para limpeza?
+6. Auditar worktrees de repos internos:
+   - Para cada repo em `repo/`, executar `git -C repo/<nome> worktree list`
+   - Aplicar as mesmas verificacoes: branch valida, HEAD detached, mudancas sem task, elegivel para limpeza
+7. Reportar estado completo:
    - Para cada item acima: OK ou ATENCAO com descricao do problema
-   - Responder `HEARTBEAT_OK` somente se todos os 7 itens estiverem sem problemas
+   - Responder `HEARTBEAT_OK` somente se todos os itens estiverem sem problemas
    - Se houver qualquer item com ATENCAO, listar o que precisa ser resolvido
