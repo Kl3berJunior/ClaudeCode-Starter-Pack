@@ -108,7 +108,7 @@ try {
 }
 
 $previousSessionUnclosed = $false
-if ($previousState -and $previousState.date -ne $today -and -not $previousState.close_done) {
+if ($previousState -and -not $previousState.close_done) {
     $previousSessionUnclosed = $true
 }
 
