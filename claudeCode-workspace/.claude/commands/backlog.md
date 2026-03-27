@@ -7,6 +7,7 @@ Passos:
 4. Aplicar a mudanca no arquivo mantendo o formato de tabela Markdown:
    `| Id | Repo | Titulo | Status | Prioridade | Origem |`
 5. Atualizar `Relatorios/Swarm/supervisor-status.md` com o novo total de tasks abertas e a data atual
+   - Se o arquivo nao existir, criar com cabecalho padrao antes de atualizar
 
 Status validos: `open`, `in-progress`, `blocked`, `done`, `cancelled`
 Prioridades validas: `high`, `medium`, `low`
