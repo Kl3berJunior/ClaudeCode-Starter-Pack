@@ -42,6 +42,33 @@ Não colocar aqui segredos, tokens ou senhas.
 - diretórios criados sob demanda — não criar estrutura vazia antecipadamente
 - todo fix com impacto visual deve ter teste de API e teste Playwright correspondente
 
+## GitHub
+
+- gh-username: `__GH_USERNAME__`
+
+### Organizações e Projetos
+
+Liste todas as orgs e projetos aos quais você tem acesso.
+Formato: uma entrada por org, com seus projetos listados abaixo.
+
+```
+### Org `__GH_ORG_NAME__`
+- login: __GH_ORG_LOGIN__
+- projetos:
+  - number: __GH_PROJECT_NUMBER__ | title: __GH_PROJECT_TITLE__ | descricao: __GH_PROJECT_DESC__
+```
+
+---
+
+### Org `Tectrilha`
+- login: tectrilha
+- projetos:
+  - number: 7 | title: Tectrilha | descricao: Projeto principal com todas as tarefas do time
+  - number: 5 | title: TransparenciaWebNew | descricao: Projeto do sistema de transparência
+  - number: 4 | title: Novo ContratoWeb | descricao: Projeto do sistema de contratos
+
+- gh-username: `Kl3berJunior`
+
 ## Preferências do agente
 
 - responder de forma concisa e direta

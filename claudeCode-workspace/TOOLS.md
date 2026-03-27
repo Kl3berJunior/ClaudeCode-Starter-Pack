@@ -32,6 +32,31 @@ Fonte canonica: `.claude/settings.json`
 - sessao longa ou problema com muita troca de contexto: usar `context-mode`
 - mensagens externas ou alerta operacional: usar `telegram` se estiver configurado
 
+### Regra de contexto do Serena por repositorio
+
+O serena opera sobre um diretorio-raiz de projeto. Ao receber uma tarefa que envolva codigo, identificar o contexto alvo antes de usar o serena:
+
+**Regras de identificacao de contexto:**
+
+1. Se a tarefa mencionar explicitamente um repo (`repo/<nome>`, nome do sistema, ou nome do servico) — usar o path desse repo como raiz do serena
+2. Se a tarefa for sobre o proprio workspace (CLAUDE.md, commands, agents, MEMORY, TOOLS, etc.) — usar o path do workspace como raiz
+3. Se nao houver indicacao clara — perguntar antes de assumir
+
+**Ordem de troca de contexto:**
+
+1. Identificar o repo alvo pela tarefa ou pela pergunta do usuario
+2. Confirmar que o path existe em `repo/<nome>/` ou em `.wt/<nome>/<branch>/`
+3. Iniciar ou redirecionar o serena para esse path antes de qualquer busca semantica
+4. Registrar o contexto ativo se houver troca durante a sessao (ex: "serena apontado para repo/meu-servico")
+
+**Paths de referencia:**
+
+| Contexto | Path |
+|----------|------|
+| Workspace | `__WORKSPACE_ROOT__` |
+| Repo interno | `__WORKSPACE_ROOT__/repo/<nome-do-repo>` |
+| Worktree de repo | `__WORKSPACE_ROOT__/.wt/<nome-kebab>/<objetivo>` |
+
 ---
 
 ## Caminhos importantes
