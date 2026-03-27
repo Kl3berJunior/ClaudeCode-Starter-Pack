@@ -1,24 +1,40 @@
 # USER
 
-Preencha aqui apenas contexto operacional util para o time.
+Contexto operacional do workspace ClaudeCode-Starter-Pack.
 
-Exemplos:
+## Linguagens e Tecnologias
 
-- linguagem principal dos repositorios
-- ambiente principal de deploy
-- horario de trabalho
-- restricoes de producao
-- preferencia por PR, squash, branch naming e validacao
-- politica de worktrees: quando abrir, como nomear e quando limpar
+- Linguagem principal: TypeScript/JavaScript, Python, Markdown
+- Ambiente: Desenvolvimento local com Node.js, Git
+- Frameworks: Claude Code, MCPs/plugins
 
-Nao coloque aqui segredos, tokens ou senhas.
+## Ambiente de Deploy
+
+- Local development only
+- No production deployment configured yet
+
+## Horario de Trabalho
+
+- Desenvolvimento contínuo conforme necessidade
+- Memória diária atualizada diariamente
+
+## Políticas de Git
+
+- Branches: usar `feat/`, `fix/`, `refactor/`, `chore/` prefixes
+- Commits: conventional commits (feat:, fix:, etc.)
+- PRs: criar PRs para mudanças significativas
+- Worktrees: usar para isolamento de tarefas
+
+## Políticas de Segurança
+
+- Não armazenar segredos em arquivos versionados
+- Usar `.claude/settings.local.json` para configurações locais
+- Validar mudanças antes de commit/push
 
 ## Worktrees
 
-Preencha se o time tiver preferencia explicita:
-
-- raiz padrao para worktrees: `.wt/` ou outro caminho
-- convencao de nome: `repo/objetivo`, `repo/branch` ou outra
-- criterio para abrir nova worktree
-- tempo maximo de ociosidade antes de auditoria ou limpeza
-- quem pode autorizar remocao de worktree com risco
+- Raiz padrão para worktrees: `.wt/`
+- Convenção de nome: `repo/objetivo` ou `repo/branch`
+- Critério para abrir nova worktree: quando trabalhar em feature/task específica
+- Tempo máximo de ociosidade: auditar semanalmente worktrees inativas
+- Autorização para remoção: maintainer do workspace pode autorizar

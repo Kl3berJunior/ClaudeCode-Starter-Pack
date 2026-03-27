@@ -164,6 +164,57 @@ Regras adicionais:
 - nao reverter trabalho alheio
 - nao usar `--no-verify` ou `--force-push` sem instrucao explicita
 
+## Review obrigatorio antes do merge
+
+Nenhum PR pode ser mergeado sem review explicita. Fluxo obrigatorio:
+
+1. Abrir o PR com `gh pr create`
+2. Aguardar o usuario revisar e aprovar — ou solicitar explicitamente ao agente que faca a review
+3. Somente apos aprovacao explicita do usuario executar `gh pr merge`
+
+Regras:
+- o agente nao pode mergear um PR sem instrucao direta do usuario
+- "pode mergear" ou "aprova" sao instrucoes validas de aprovacao
+- nunca assumir aprovacao implicita por ausencia de objecao
+
+## Testes
+
+Testes vivem em `tests/<nome-do-repo>/<modulo>/`.
+
+- `<nome-do-repo>`: nome do repositorio em kebab-case (ex: `meu-servico`, `portal-web`)
+- `<modulo>`: area funcional coberta pelo teste (ex: `despesa`, `autenticacao`, `relatorio`)
+- Diretorios sao criados sob demanda — nao criar estrutura vazia antecipadamente
+- Nunca criar arquivos de teste na raiz do workspace ou dentro de `repo/`
+
+Convencao de nomenclatura:
+
+| Tipo | Tecnologia | Nomenclatura |
+|------|-----------|--------------|
+| API / backend | PowerShell | `test_<cenario>.ps1` |
+| Frontend / UI | Playwright (TypeScript) | `<cenario>.spec.ts` |
+
+Ao criar um novo teste:
+1. Identificar o repositorio alvo e converter o nome para kebab-case
+2. Criar `tests/<nome-do-repo>/<modulo>/` somente se ainda nao existir
+3. Nomear o arquivo conforme o cenario testado, nao o endpoint ou componente
+4. Se o fix tiver impacto visual, criar teste de API **e** teste Playwright correspondente
+
+## Pos-merge obrigatorio
+
+Apos um PR ser aprovado e mergeado:
+
+1. Deletar o branch remoto (o GitHub faz automaticamente via `delete_branch_on_merge=true`).
+2. Deletar o branch local:
+   ```
+   git checkout main
+   git pull origin main
+   git branch -d <branch>
+   ```
+3. Podar referencias remotas obsoletas:
+   ```
+   git remote prune origin
+   ```
+
 ## Encerramento de sessao
 
 Ao finalizar cada sessao ou execucao de agente:
