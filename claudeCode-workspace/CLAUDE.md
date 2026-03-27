@@ -106,7 +106,9 @@ Worktrees sao o mecanismo padrao para paralelo limpo, auditoria rastreavel e iso
 Regras:
 
 - worktrees operacionais devem viver em `.wt/`
-- usar o padrao `.wt/<repo>/<objetivo-ou-branch>` para manter auditoria simples
+- padrao de caminho por tipo:
+  - workspace: `.wt/workspace/<objetivo-ou-branch>` — para isolar trabalho no proprio workspace
+  - repo interno: `.wt/<repo-em-kebab-case>/<objetivo-ou-branch>` — para repos em `repo/` (git repos separados)
 - cada worktree deve ter um objetivo claro, uma branch associada e um dono ou task rastreavel
 - antes de criar nova worktree, auditar o estado atual com `git worktree list --porcelain`
 - ao iniciar ou retomar uma task, verificar se ja existe worktree adequada antes de abrir outra
@@ -140,7 +142,7 @@ Agentes disponiveis em `.claude/agents/`:
 
 - `/review-deep <arquivo>` — analise profunda via Opus
 - `/explain <simbolo-ou-arquivo>` — explicacao concisa via Sonnet
-- `/agent-router <tarefa>` — roteamento automatico por complexidade
+- `/agent-router <tarefa>` — roteamento automatico por complexidade (o proprio router roda em Sonnet e delega para Opus, Sonnet ou Haiku conforme a tarefa)
 
 ## Git
 
