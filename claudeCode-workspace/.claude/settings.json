@@ -2,8 +2,6 @@
   "permissions": {
     "allow": [
       "Bash(git:*)",
-      "Bash(ls:*)",
-      "Bash(cat:*)",
       "Read(*)",
       "Write(*)",
       "Edit(*)",
