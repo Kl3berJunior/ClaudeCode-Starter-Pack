@@ -14,7 +14,12 @@ Não colocar aqui segredos, tokens ou senhas.
 
 ## Fluxo de trabalho
 
-- todo trabalho de código via branch dedicada: `agent/<objetivo>`
+- todo trabalho de código via branch dedicada com prefixo convencional:
+  - `feat/<objetivo>` — nova funcionalidade
+  - `fix/<objetivo>` — correcao de bug
+  - `chore/<objetivo>` — manutencao, configuracao, infraestrutura
+  - `refactor/<objetivo>` — refatoracao sem mudanca de comportamento
+  - `docs/<objetivo>` — documentacao
 - PRs obrigatórias antes de mergear em `main`
 - review explícita do usuário obrigatória antes do merge — o agente não mergea sem instrução direta
 - mensagens de commit no formato convencional: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`
