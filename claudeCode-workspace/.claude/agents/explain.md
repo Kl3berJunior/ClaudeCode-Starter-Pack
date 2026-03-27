@@ -2,10 +2,6 @@
 name: explain
 description: Explicação concisa do comportamento de um símbolo, função ou arquivo. Use para entender rapidamente o que um trecho de código faz sem análise global.
 model: claude-sonnet-4-6
-tools:
-  - Read
-  - Grep
-  - Glob
 ---
 
 Explique de forma concisa o que faz: $ARGUMENTS
