@@ -54,7 +54,8 @@ ClaudeCode-Starter-Pack/
 | `claudeCode-workspace/memory/` | Memoria diaria no formato `YYYY-MM-DD.md`. |
 | `claudeCode-workspace/.claude/settings.json` | Permissoes e plugins habilitados. Fonte canonica dos MCPs. |
 | `claudeCode-workspace/.claude/commands/` | Slash commands do workspace. |
-| `claudeCode-workspace/.claude/agents/` | Subagentes especializados. |
+| `claudeCode-workspace/.claude/agents/` | Subagentes especializados (review-deep, explain, agent-router, test-runner). |
+| `claudeCode-workspace/Relatorios/` | Artefatos canonicos: backlog, status do supervisor, sessoes de agente. |
 | `claudeCode-workspace/.serena/` | Configuracao local do Serena para navegacao semantica. |
 | `claudeCode-workspace/repo/CLAUDE.md` | Template para o contrato local de cada repo de codigo. |
 
@@ -71,7 +72,8 @@ Importante:
 
 - este pack nao deve guardar segredos, tokens ou senhas em arquivos versionados
 - `.claude/settings.local.json` existe justamente para ajustes locais fora do versionamento
-- `Relatorios/`, `Swarm/`, `.wt/` e `.serena/memories/` ja estao previstos no `.gitignore` do workspace
+- `memory/`, `.wt/` e `.serena/memories/` estao no `.gitignore` — sao dados locais nao versionados
+- `Relatorios/` e versionado — `task-backlog.md`, `supervisor-status.md` e `agent-sessions/` sao arquivos canonicos
 
 ## 4. Como instalar o pack em um workspace real
 
@@ -462,7 +464,7 @@ Objetivo:
 - limpar branches locais marcadas como `[gone]` (deletadas no remoto)
 - remove worktrees associadas antes de deletar a branch
 
-### `/worktree <acao> [nome] [branch]`
+### `/worktree <acao> [tipo] [nome] [branch]`
 
 Objetivo:
 
@@ -475,25 +477,29 @@ Acoes previstas:
 - `remover`
 - `limpar`
 
-Importante: o contrato canonico do workspace usa o padrao:
+O parametro `tipo` define o contexto da worktree:
+
+- `workspace` (padrao): worktree do proprio workspace, para isolar config, docs ou experimentos
+  - caminho: `.wt/workspace/<objetivo>`
+  - comando: `git worktree add .wt/workspace/<objetivo> -b <branch>`
+- `repo`: worktree de um repo interno em `repo/<nome>/` — sao git repos separados
+  - caminho: `.wt/<repo>/<objetivo>`
+  - comando: `git -C repo/<nome> worktree add ../../.wt/<repo>/<objetivo> -b <branch>`
+
+Exemplos:
 
 ```text
-.wt/<repo>/<objetivo-ou-branch>
+/worktree criar workspace ajuste-config chore/ajuste-config
+/worktree criar repo minha-api feat-login feat/login
 ```
-
-Entao, quando voce passar o `nome` para o comando, prefira ja usar esse formato. Exemplo:
-
-```text
-/worktree criar api/ajuste-login feat/ajuste-login
-```
-
-Assim voce mantem o comando e o contrato do workspace alinhados.
 
 ## 10. Agentes incluidos no pack
 
 Os agentes ficam em:
 
 - `claudeCode-workspace/.claude/agents/`
+
+Todos os agentes herdam automaticamente todos os MCPs habilitados no workspace (serena, context7, playwright, context-mode). Nao ha restricao de ferramentas — o modelo escolhido e a unica diferenca entre eles.
 
 ### `/review-deep <arquivo-ou-modulo>`
 
@@ -530,7 +536,7 @@ O foco e:
 
 Usa:
 
-- `claude-sonnet-4-6` como roteador
+- `claude-sonnet-4-6` como roteador — o proprio router roda em Sonnet e delega para o modelo adequado
 
 Funcao:
 
@@ -542,14 +548,48 @@ Heuristica atual:
 - `sonnet`: geracao de codigo, testes, explicacoes e tarefas com escopo claro
 - `haiku`: operacoes mecanicas, glob, grep, rename, verificacoes simples
 
+### `/test-runner <repo e cenario>`
+
+Usa:
+
+- `claude-sonnet-4-6`
+
+Quando usar:
+
+- criar testes de API em PowerShell para um repo
+- criar testes de frontend em Playwright TypeScript
+- executar testes existentes e reportar resultados
+
+Convencao de arquivos:
+
+- API: `tests/<repo-kebab>/<modulo>/test_<cenario>.ps1`
+- Frontend: `tests/<repo-kebab>/<modulo>/<cenario>.spec.ts`
+
+Se o fix tiver impacto visual, criar teste de API **e** teste Playwright correspondente.
+
 ## 11. Como usar worktrees do jeito certo
 
 O pack trata worktree como mecanismo padrao para paralelo limpo e rastreavel.
 
-### Convencao recomendada
+### Dois tipos de worktree
+
+**Tipo `workspace`** — para isolar trabalho no proprio workspace (config, docs, experimentos):
 
 ```text
-.wt/<repo-kebab-case>/<objetivo-ou-branch>
+.wt/workspace/<objetivo-ou-branch>
+```
+
+Exemplos:
+
+```text
+.wt/workspace/ajuste-config
+.wt/workspace/docs-novo-fluxo
+```
+
+**Tipo `repo`** — para repos internos em `repo/` (cada um e um git repo separado):
+
+```text
+.wt/<repo-em-kebab-case>/<objetivo-ou-branch>
 ```
 
 Exemplos:
@@ -560,7 +600,7 @@ Exemplos:
 .wt/app-mobile/chore-upgrade-sdk
 ```
 
-O branch associado a worktree deve seguir o mesmo prefixo convencional: `feat/`, `fix/`, `chore/`, etc.
+O branch associado deve seguir prefixo convencional: `feat/`, `fix/`, `chore/`, `refactor/`, `docs/`.
 
 ### Regras operacionais do pack
 
@@ -573,21 +613,27 @@ O branch associado a worktree deve seguir o mesmo prefixo convencional: `feat/`,
 ### Comandos uteis
 
 ```bash
-# Auditoria
+# Auditoria do workspace
 git worktree list --porcelain
+
+# Auditoria de repo interno
+git -C repo/minha-api worktree list --porcelain
+
+# Criar worktree do workspace
+git worktree add .wt/workspace/ajuste-config -b chore/ajuste-config
+
+# Criar worktree de repo interno (a partir da raiz do workspace)
+git -C repo/minha-api worktree add ../../.wt/minha-api/feat-login-social -b feat/login-social
+
+# Status de uma worktree
 git -C .wt/minha-api/feat-login-social status --short --branch
 
-# Criar com nova branch
-git worktree add .wt/minha-api/feat-login-social -b feat/login-social
+# Remover worktree do workspace
+git worktree remove .wt/workspace/ajuste-config && git worktree prune
 
-# Criar com branch existente
-git worktree add .wt/minha-api/feat-login-social feat/login-social
-
-# Remover worktree limpa
-git worktree remove .wt/minha-api/feat-login-social
-
-# Podar metadata orfa
-git worktree prune
+# Remover worktree de repo interno
+git -C repo/minha-api worktree remove ../../.wt/minha-api/feat-login-social
+git -C repo/minha-api worktree prune
 ```
 
 ### Inventario minimo recomendado por worktree
@@ -657,11 +703,14 @@ Se algo precisa sobreviver entre sessoes, promova para `MEMORY.md`. Senao a info
 
 ### Abrir worktrees com nome inconsistente
 
-Se cada worktree seguir um padrao diferente, a auditoria fica ruim. O pack foi desenhado para funcionar melhor com:
+Se cada worktree seguir um padrao diferente, a auditoria fica ruim. O pack usa dois subtipos:
 
 ```text
-.wt/<repo>/<objetivo-ou-branch>
+.wt/workspace/<objetivo>        # para trabalho no workspace
+.wt/<repo>/<objetivo>           # para repos internos
 ```
+
+Repos internos em `repo/` sao git repos separados e precisam de `git -C repo/<nome> worktree add` — nao use `git worktree add` diretamente para eles.
 
 ## 15. Checklist rapido de implantacao
 
