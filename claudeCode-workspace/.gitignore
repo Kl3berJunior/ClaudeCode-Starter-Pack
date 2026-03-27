@@ -3,6 +3,7 @@
 
 # Estado local nao rastreavel
 # Relatorios/ e versionado — task-backlog.md, supervisor-status.md e agent-sessions/ sao canonicos
+memory/
 
 # Worktrees temporarias
 .wt/
