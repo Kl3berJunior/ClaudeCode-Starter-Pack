@@ -22,12 +22,13 @@ ClaudeCode-Stater-Pack/
     |   |-- agents/
     |   |   |-- review-deep.md       # Agente Opus: analise arquitetural profunda
     |   |   |-- explain.md           # Agente Sonnet: explicacao concisa de simbolos e arquivos
-    |   |   `-- agent-router.md      # Agente roteador: classifica e delega por complexidade
+    |   |   |-- agent-router.md      # Agente Sonnet: classifica e delega para Opus/Sonnet/Haiku
+    |   |   `-- test-runner.md       # Agente Sonnet: criacao e execucao de testes (PowerShell + Playwright)
     |   `-- commands/
     |       |-- backlog.md           # Slash command para listar e atualizar backlog operacional
     |       |-- daily-memory.md      # Slash command para registrar memoria diaria
-    |       |-- heartbeat.md         # Slash command para checagem rapida de saude operacional
-    |       `-- worktree.md          # Slash command para auditar e operar worktrees
+    |       |-- heartbeat.md         # Slash command para checagem completa de saude operacional (7 itens)
+    |       `-- worktree.md          # Slash command para auditar e operar worktrees (workspace e repo)
     |-- .serena/
     |   |-- .gitignore               # Ignora estado local do Serena dentro da pasta
     |   |-- project.yml              # Config principal do projeto Serena
@@ -131,7 +132,11 @@ Explicacao concisa do comportamento via **Sonnet**. Foco no que entra, o que sai
 
 ### `/agent-router <tarefa>`
 
-Roteador de complexidade via **Sonnet**. Classifica a tarefa (Opus / Sonnet / Haiku) e spawna o subagente adequado. Suporta execucao paralela de partes independentes.
+Roteador de complexidade via **Sonnet**. O proprio router roda em Sonnet e classifica a tarefa para delegar ao modelo adequado (Opus / Sonnet / Haiku). Suporta execucao paralela de partes independentes.
+
+### `/test-runner <repo e cenario>`
+
+Criacao e execucao de testes via **Sonnet**. Cobre testes de API em PowerShell (`tests/<repo>/<modulo>/test_<cenario>.ps1`) e testes de frontend em Playwright TypeScript (`tests/<repo>/<modulo>/<cenario>.spec.ts`). Reporta resultados com total de passou/falhou e proximos passos.
 
 ### Criterio de roteamento
 
@@ -160,7 +165,11 @@ MCPs atuais:
 
 ## `.gitignore`
 
-Ignora configuracoes locais, relatorios gerados, segredos locais e `.wt/`.
+Ignora configuracoes locais, diarios de memoria, segredos locais e `.wt/`.
+
+`Relatorios/` e versionado — `task-backlog.md`, `supervisor-status.md` e `agent-sessions/` sao arquivos canonicos do workspace.
+
+`memory/` e ignorado — diarios operacionais sao locais e nao devem ser versionados no template.
 
 ---
 
@@ -177,8 +186,10 @@ Worktrees sao o mecanismo padrao para isolamento e paralelo limpo.
 Convencao:
 
 - raiz em `.wt/`
-- padrao `.wt/<repo-kebab-case>/<objetivo-ou-branch>`
-- prefixo de branch recomendado: `agent/<objetivo>`
+- dois subtipos:
+  - `workspace`: `.wt/workspace/<objetivo-ou-branch>` — para isolar trabalho no proprio workspace
+  - `repo`: `.wt/<repo-em-kebab-case>/<objetivo-ou-branch>` — para repos internos em `repo/` (git repos separados)
+- prefixo de branch: `feat/`, `fix/`, `chore/`, `refactor/`, `docs/`
 
 Regras:
 
@@ -186,6 +197,7 @@ Regras:
 - verificar reaproveitamento antes de abrir outra
 - nunca remover com mudancas nao commitadas sem confirmar
 - pedir confirmacao antes de remover
+- repos internos usam `git -C repo/<nome> worktree` — sao git repos separados
 
 ---
 
