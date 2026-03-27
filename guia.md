@@ -349,13 +349,37 @@ Use as ferramentas conforme o tipo de tarefa:
 Sempre que estiver mexendo em codigo:
 
 - verifique se o branch atual esta limpo antes de comecar
-- crie um branch dedicado antes de qualquer edicao: `git checkout -b agent/<nome-curto>`
+- crie um branch dedicado antes de qualquer edicao usando prefixo convencional:
+  - `git checkout -b feat/<objetivo>`
+  - `git checkout -b fix/<objetivo>`
+  - `git checkout -b chore/<objetivo>`
+  - `git checkout -b refactor/<objetivo>`
+  - `git checkout -b docs/<objetivo>`
 - nunca commite em `main` ou `master`
-- use formato convencional nas mensagens: `feat:`, `fix:`, `refactor:`, `chore:`
+- use formato convencional nas mensagens: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`
 - respeite primeiro o `CLAUDE.md` do repo local
 - valide o que alterou (testes, lint, build)
 - nao reverta trabalho alheio
 - nao faca push ou publicacao sem instrucao clara
+
+### Pos-merge obrigatorio
+
+Apos um PR ser mergeado:
+
+1. Use `gh pr merge <numero> --merge` — sem `--delete-branch` (o GitHub apaga o remoto automaticamente via `delete_branch_on_merge=true`).
+2. Volte para main e atualize:
+   ```
+   git checkout main
+   git pull origin main
+   ```
+3. Delete o branch local (se ainda existir):
+   ```
+   git branch -d <branch>
+   ```
+4. Pode referencias remotas obsoletas:
+   ```
+   git remote prune origin
+   ```
 
 ### Encerramento da sessao
 
@@ -525,16 +549,18 @@ O pack trata worktree como mecanismo padrao para paralelo limpo e rastreavel.
 ### Convencao recomendada
 
 ```text
-.wt/<repo>/<objetivo-ou-branch>
+.wt/<repo-kebab-case>/<objetivo-ou-branch>
 ```
 
 Exemplos:
 
 ```text
-.wt/api/feat-login-social
-.wt/web/fix-header-mobile
-.wt/mobile/chore-upgrade-sdk
+.wt/minha-api/feat-login-social
+.wt/portal-web/fix-header-mobile
+.wt/app-mobile/chore-upgrade-sdk
 ```
+
+O branch associado a worktree deve seguir o mesmo prefixo convencional: `feat/`, `fix/`, `chore/`, etc.
 
 ### Regras operacionais do pack
 
@@ -546,11 +572,21 @@ Exemplos:
 
 ### Comandos uteis
 
-```powershell
+```bash
+# Auditoria
 git worktree list --porcelain
-git -C .wt/api/feat-login-social status --short --branch
-git worktree add .wt/api/feat-login-social -b feat-login-social
-git worktree remove .wt/api/feat-login-social
+git -C .wt/minha-api/feat-login-social status --short --branch
+
+# Criar com nova branch
+git worktree add .wt/minha-api/feat-login-social -b feat/login-social
+
+# Criar com branch existente
+git worktree add .wt/minha-api/feat-login-social feat/login-social
+
+# Remover worktree limpa
+git worktree remove .wt/minha-api/feat-login-social
+
+# Podar metadata orfa
 git worktree prune
 ```
 

@@ -40,6 +40,7 @@ ClaudeCode-Stater-Pack/
     |-- CLAUDE.md                    # Contrato operacional principal do workspace
     |-- HEARTBEAT.md                 # Checklist curto de saude operacional
     |-- MEMORY.md                    # Memoria duravel com contratos e decisoes persistentes
+    |-- README.md                    # Guia rapido do workspace (estrutura, MCPs, comandos, fluxo)
     |-- SOUL.md                      # Principios permanentes do fluxo de trabalho
     |-- TOOLS.md                     # Comandos, caminhos, MCPs e padrao de worktrees
     `-- USER.md                      # Contexto operacional do time e preferencias locais
@@ -176,12 +177,14 @@ Worktrees sao o mecanismo padrao para isolamento e paralelo limpo.
 Convencao:
 
 - raiz em `.wt/`
-- padrao `.wt/<repo>/<objetivo-ou-branch>`
+- padrao `.wt/<repo-kebab-case>/<objetivo-ou-branch>`
+- prefixo de branch recomendado: `agent/<objetivo>`
 
 Regras:
 
 - auditar antes de criar nova worktree
 - verificar reaproveitamento antes de abrir outra
+- nunca remover com mudancas nao commitadas sem confirmar
 - pedir confirmacao antes de remover
 
 ---

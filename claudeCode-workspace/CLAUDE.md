@@ -147,9 +147,13 @@ Agentes disponiveis em `.claude/agents/`:
 Fluxo obrigatorio ao fazer alteracoes em codigo:
 
 1. Verificar se o branch atual esta limpo (sem mudancas nao commitadas). Se nao estiver, parar e confirmar com o usuario antes de continuar.
-2. Criar um novo branch antes de editar qualquer arquivo:
+2. Criar um novo branch antes de editar qualquer arquivo usando prefixo convencional:
    ```
-   git checkout -b agent/<nome-curto-da-tarefa>
+   git checkout -b feat/<objetivo>
+   git checkout -b fix/<objetivo>
+   git checkout -b chore/<objetivo>
+   git checkout -b refactor/<objetivo>
+   git checkout -b docs/<objetivo>
    ```
 3. Nunca commitar diretamente em `main` ou `master`.
 4. Usar mensagens de commit no formato convencional:
@@ -157,6 +161,7 @@ Fluxo obrigatorio ao fazer alteracoes em codigo:
    - `fix: ...`
    - `refactor: ...`
    - `chore: ...`
+   - `docs: ...`
 5. Antes de concluir: rodar testes, linters e garantir que o projeto compila.
 
 Regras adicionais:
@@ -203,14 +208,17 @@ Ao criar um novo teste:
 
 Apos um PR ser aprovado e mergeado:
 
-1. Deletar o branch remoto (o GitHub faz automaticamente via `delete_branch_on_merge=true`).
-2. Deletar o branch local:
+1. Mergear via `gh pr merge <numero> --merge` (sem `--delete-branch` — o GitHub apaga o remoto automaticamente via `delete_branch_on_merge=true`).
+2. Voltar para main e atualizar:
    ```
    git checkout main
    git pull origin main
+   ```
+3. Deletar o branch local (se ainda existir):
+   ```
    git branch -d <branch>
    ```
-3. Podar referencias remotas obsoletas:
+4. Podar referencias remotas obsoletas:
    ```
    git remote prune origin
    ```
