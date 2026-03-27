@@ -1,88 +1,160 @@
-Buscar tarefas de um GitHub Project com filtros compostos e retornar output estruturado pronto para delegação.
+Trabalhar com GitHub Projects via `gh project`, com foco em analise, listagem e operacao segura.
 
-## Uso
+Uso:
+`/gh-project <acao> [argumentos]`
 
-```
-/gh-project [filtros...]
-```
+Acoes disponiveis:
+- `analisar [org=<login>] [project=<numero>]`
+- `projetos [org=<login>]`
+- `itens [org=<login>] [project=<numero>] [query="<filtro>"] [limit=<n>]`
+- `adicionar [org=<login>] [project=<numero>] url=<issue-ou-pr-url>`
+- `campos [org=<login>] [project=<numero>]`
 
-Filtros disponíveis (qualquer combinação, em qualquer ordem):
-
-| Filtro | Exemplo | Descrição |
-|--------|---------|-----------|
-| `org=<nome>` | `org=tectrilha` | Organização GitHub |
-| `project=<n>` | `project=7` | Número do projeto |
-| `assignee=<login>` | `assignee=Kl3berJunior` | Login GitHub do responsável |
-| `status=<valor>` | `status="In Progress"` | Status exato do item |
-| `sistema=<valor>` | `sistema=Captacao` | Campo "sistema" do projeto |
-| `cliente=<valor>` | `cliente=PMC` | Campo "cliente" do projeto |
-| `prioridade=<valor>` | `prioridade=alto` | Campo "prioridade" do projeto |
-| `repo=<repo>` | `repo=portalgestao` | Repositório associado (parcial) |
-
-Se um filtro não for informado, não aplica restrição para aquele campo.
-Se `org` não for informado e houver apenas uma org em `USER.md`, usá-la como padrão. Se houver mais de uma, perguntar qual usar.
-Se `project` não for informado e a org tiver apenas um projeto, usá-lo como padrão. Se houver mais de um, listar os disponíveis e perguntar.
-Se `assignee` não for informado, listar tarefas de todos (sem filtro de responsável).
-
-## Passos
-
+Passos obrigatorios:
 1. Ler `USER.md` para obter:
-   - `gh-username`: login do usuário
-   - A lista de orgs e seus projetos na seção `### Organizações e Projetos`
+   - `gh-username`
+   - orgs conhecidas
+   - projetos conhecidos por org
+2. Validar autenticacao com `gh auth status`.
+3. Se o token estiver invalido ou sem escopo `project`, parar e orientar:
+   - `gh auth login -h github.com`
+   - `gh auth refresh -s project`
+4. Resolver defaults:
+   - Se `org` nao for informada e existir apenas uma org em `USER.md`, usar essa org
+   - Se `project` nao for informado e a org tiver apenas um projeto em `USER.md`, usar esse projeto
+   - Se houver ambiguidade, listar as opcoes e pedir confirmacao
+5. Executar o comando `gh project` correspondente, preferindo `--format json` quando houver saida estruturada
+6. Responder com output curto, verificavel e pronto para uso na proxima acao
 
-2. Parsear `$ARGUMENTS` extraindo pares `chave=valor`. Valores com espaços podem vir entre aspas.
+## analisar
+Objetivo: inspecionar o contexto de GitHub Projects disponivel para o usuario.
 
-3. Montar os parâmetros finais combinando defaults com o que foi passado.
+Passos:
+1. Se `org` nao vier informada:
+   - listar as orgs encontradas em `USER.md`
+   - se necessario, listar tambem os projetos mapeados em cada org
+2. Executar:
+   - `gh project list --owner <org> --format json`
+3. Se `project=<numero>` for informado, executar tambem:
+   - `gh project view <numero> --owner <org> --format json`
+   - `gh project field-list <numero> --owner <org> --format json`
+   - `gh project item-list <numero> --owner <org> --limit 100 --format json`
+4. Apresentar:
+   - org analisada
+   - projetos encontrados
+   - se houver projeto especifico: titulo, url, visibilidade, campos e quantidade de itens
 
-4. Executar o comando para buscar os itens do projeto:
-   ```bash
-   gh project item-list <project> --owner <org> --format json --limit 500
-   ```
+Formato de resposta sugerido:
+```md
+## GitHub Project
+- owner: <org>
+- projetos encontrados: <N>
 
-5. Ler o JSON retornado e aplicar **todos** os filtros informados:
-   - `assignee`: checar se o login está na lista `assignees` do item (case-insensitive)
-   - `status`: comparar com o campo `status` (case-insensitive)
-   - `sistema`: comparar com o campo `sistema` (case-insensitive)
-   - `cliente`: comparar com o campo `cliente` (case-insensitive)
-   - `prioridade`: comparar com o campo `prioridade` (case-insensitive)
-   - `repo`: checar se o campo `repository` contém o valor informado (substring, case-insensitive)
-
-6. Agrupar os itens resultantes por `status` e apresentar no formato:
-
+### Projeto <numero>
+- titulo: <title>
+- url: <url>
+- campos: <N>
+- itens analisados: <N>
 ```
-## [STATUS] (N tarefas)
-- [#numero] Título da tarefa
-  repo: org/repo | sistema: X | prioridade: Y | cliente: Z
-  assignees: login1, login2
-  descricao: primeiros 120 chars do body da issue (se disponível)
+
+## projetos
+Objetivo: listar os projetos disponiveis para um owner.
+
+Comando:
+`gh project list --owner <org> --limit 100 --format json`
+
+Retornar:
+- `number`
+- `title`
+- `closed`
+- `url`
+- `shortDescription`
+
+Formato de resposta sugerido:
+```md
+## Projetos de <org>
+- #<numero> | <titulo> | <aberto-ou-fechado> | <url>
+- #<numero> | <titulo> | <aberto-ou-fechado> | <url>
 ```
 
-7. Ao final, exibir o resumo:
+## itens
+Objetivo: listar itens de um projeto.
+
+Comando base:
+`gh project item-list <project> --owner <org> --limit <n> --format json`
+
+Se `query` vier informada, usar:
+`gh project item-list <project> --owner <org> --limit <n> --query "<filtro>" --format json`
+
+Regras:
+- usar `limit=100` por padrao quando nao informado
+- se a consulta vier vazia, listar tudo
+- agrupar por `status` quando esse campo estiver disponivel
+- destacar issue/PR, repositorio e assignees quando existirem
+
+Formato de resposta sugerido:
+```md
+## Itens do projeto <org>/<project>
+
+### <STATUS> (<N>)
+- [<tipo> #<numero>] <titulo>
+  repo: <org/repo>
+  assignees: <login1, login2>
 ```
----
-Total filtrado: N tarefas
-Filtros aplicados: assignee=X status=Y ...
-Projeto: org/projects/N
+
+## adicionar
+Objetivo: adicionar uma issue ou PR existente ao projeto.
+
+Validacoes:
+- `url` e obrigatoria
+- confirmar `org` e `project` antes de executar se nao vierem explicitos e houver mais de uma opcao
+
+Comando:
+`gh project item-add <project> --owner <org> --url <url> --format json`
+
+Retornar:
+- confirmacao de owner e projeto
+- URL adicionada
+- id do item, se presente na resposta
+
+Formato de resposta sugerido:
+```md
+Item adicionado ao projeto com sucesso.
+- owner: <org>
+- projeto: <numero>
+- url: <url>
+- itemId: <id>
 ```
 
-## Output estruturado para delegação
+## campos
+Objetivo: listar os campos configurados em um projeto.
 
-Após apresentar o resultado, se o número de tarefas for > 0, adicionar a seção:
+Comando:
+`gh project field-list <project> --owner <org> --limit 100 --format json`
 
+Retornar:
+- nome do campo
+- tipo
+- opcoes, quando existirem
+
+Formato de resposta sugerido:
+```md
+## Campos do projeto <org>/<project>
+- <nome-do-campo> | <tipo-do-campo>
+- <nome-do-campo> | <tipo-do-campo>
+- <nome-do-campo> | <tipo-do-campo>
 ```
-## Contexto para delegação
 
-Cada tarefa acima contém:
-- Identificador único: #numero no repositório org/repo
-- Descrição completa disponível via: gh issue view <numero> --repo <org/repo>
-- Campos de contexto: sistema, cliente, prioridade, tamanho
-- Responsável atual: assignees
-
-Para delegar, use: /delegate <numero> <org/repo>
-```
+## Regras operacionais
+- Este comando nao deve criar, editar, fechar ou deletar projetos sem pedido explicito do usuario
+- Este comando nao deve mergear PRs
+- Se a tarefa evoluir para fluxo de PR, seguir `CLAUDE.md`: sem merge sem aprovacao explicita do usuario
+- Quando houver merge autorizado pelo usuario, usar `gh pr merge <numero> --merge` sem `--delete-branch`
+- Em erros de permissao, autenticar primeiro e so depois repetir o comando
+- Sempre preferir owner e numero de projeto vindos de `USER.md` quando houver contexto suficiente
 
 ## Erros comuns
-
-- Se `totalCount: 0` retornar, verificar se org e project number estão corretos.
-- Se o filtro de `assignee` retornar 0 itens mas deveria ter resultados, listar os primeiros 3 itens brutos para inspecionar o formato do campo `assignees`.
-- Se o campo customizado não existir no item (ex: `sistema` ausente), ignorar esse filtro silenciosamente.
+- `Failed to log in` ou token invalido: executar `gh auth login -h github.com`
+- falta de escopo `project`: executar `gh auth refresh -s project`
+- owner incorreto: conferir a secao de GitHub em `USER.md`
+- projeto nao encontrado: rodar `gh project list --owner <org>`
