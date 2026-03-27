@@ -1,9 +1,8 @@
 # Segredos locais
 .claude/settings.local.json
 
-# Estado e logs operacionais locais
-Relatorios/
-Swarm/
+# Estado local nao rastreavel
+# Relatorios/ e versionado — task-backlog.md, supervisor-status.md e agent-sessions/ sao canonicos
 
 # Worktrees temporarias
 .wt/
