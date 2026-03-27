@@ -231,6 +231,7 @@ No estado atual deste pack, ele:
   - `playwright@claude-plugins-official`
   - `context7@claude-plugins-official`
   - `context-mode@context-mode`
+  - `commit-commands@claude-plugins-official`
 
 Se algum plugin nao fizer sentido no seu ambiente, ajuste aqui. O guia operacional do workspace assume que esse arquivo e a fonte canonica dos MCPs ativos.
 
@@ -343,20 +344,26 @@ Use as ferramentas conforme o tipo de tarefa:
 - `playwright`: para fluxos web, validacao funcional e regressao visual
 - `context-mode`: para tarefas longas, com muitos arquivos ou continuidade de contexto
 - `telegram`: para notificacoes e interacao remota, se estiver configurado
+- `commit-commands`: para commits, push e abertura de PR via slash commands
 
 Sempre que estiver mexendo em codigo:
 
+- verifique se o branch atual esta limpo antes de comecar
+- crie um branch dedicado antes de qualquer edicao: `git checkout -b agent/<nome-curto>`
+- nunca commite em `main` ou `master`
+- use formato convencional nas mensagens: `feat:`, `fix:`, `refactor:`, `chore:`
 - respeite primeiro o `CLAUDE.md` do repo local
-- valide o que alterou
+- valide o que alterou (testes, lint, build)
 - nao reverta trabalho alheio
 - nao faca push ou publicacao sem instrucao clara
 
 ### Encerramento da sessao
 
-1. Rode a validacao relevante do repo.
+1. Rode testes, linters e verifique que o projeto compila.
 2. Atualize a memoria diaria com `/daily-memory`.
-3. Promova para `MEMORY.md` apenas o que for realmente duravel.
-4. Verifique se alguma worktree pode ser limpa.
+3. Salve um resumo da sessao em `Relatorios/agent-sessions/YYYY-MM-DD-session.md` com objetivo, arquivos alterados e comandos executados.
+4. Promova para `MEMORY.md` apenas o que for realmente duravel.
+5. Verifique se alguma worktree pode ser limpa.
 
 ## 9. Slash commands incluidos no pack
 
@@ -411,6 +418,25 @@ Fluxo esperado:
 - criar se necessario
 - registrar fatos, decisoes, riscos e links
 - avaliar promocao para `MEMORY.md`
+
+### `/commit-commands:commit`
+
+Objetivo:
+
+- criar um commit git com mensagem gerada automaticamente a partir das mudancas staged
+
+### `/commit-commands:commit-push-pr`
+
+Objetivo:
+
+- criar um commit, fazer push e abrir um pull request em sequencia
+
+### `/commit-commands:clean_gone`
+
+Objetivo:
+
+- limpar branches locais marcadas como `[gone]` (deletadas no remoto)
+- remove worktrees associadas antes de deletar a branch
 
 ### `/worktree <acao> [nome] [branch]`
 
@@ -550,6 +576,7 @@ Use esta regra para manter o workspace limpo:
 | checklist de saude | `HEARTBEAT.md` |
 | backlog operacional | `Relatorios/Swarm/task-backlog.md` |
 | status resumido do supervisor | `Relatorios/Swarm/supervisor-status.md` |
+| resumo de sessao de agente | `Relatorios/agent-sessions/YYYY-MM-DD-session.md` |
 | artefatos por repositorio | `Relatorios/__REPO_NAME__/` |
 
 Regra pratica:
