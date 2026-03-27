@@ -65,14 +65,55 @@ O serena opera sobre um diretorio-raiz de projeto. Ao receber uma tarefa que env
 - repositorios de codigo: `__WORKSPACE_ROOT__/repo/`
 - testes: `__WORKSPACE_ROOT__/tests/`
 - configuracao Claude Code: `.claude/settings.json`
+- hooks de sessao: `.claude/hooks/`
 - comandos customizados: `.claude/commands/`
 - memoria diaria: `memory/`
+- marcador local de sessao: `memory/_session-state.json`
 - memoria duravel: `MEMORY.md`
 - contrato operacional: `CLAUDE.md`
 - worktrees locais: `.wt/`
 - relatorios de sessao: `Relatorios/agent-sessions/`
 - backlog de tasks: `Relatorios/Swarm/task-backlog.md`
 - status do supervisor: `Relatorios/Swarm/supervisor-status.md`
+
+---
+
+## Fluxo de sessao no Claude CLI
+
+Sequencia recomendada ao abrir o workspace:
+
+1. abrir o Claude CLI na raiz do workspace
+2. deixar o hook `SessionStart` auto-inicializar a sessao e gravar `memory/_session-state.json`
+3. se houver bloqueio do `UserPromptSubmit` ou duvida de contexto, executar `/startup`
+4. ler o resumo retornado e confirmar se a tarefa da sessao vai usar workspace principal, repo interno ou worktree
+5. seguir com `/backlog`, `/worktree`, `/gh-project` e `/delegate` conforme o tipo de trabalho
+
+Sequencia recomendada ao encerrar:
+
+1. executar `/close-session`
+2. conferir a memoria diaria, o relatorio de sessao e o marcador local atualizados
+3. deixar o hook `SessionEnd` registrar o encerramento leve ao fechar o CLI
+4. revisar pendencias, worktrees elegiveis para limpeza e proximos passos
+5. so entao encerrar o Claude CLI
+
+Regra pratica:
+
+- se a auto-inicializacao falhar ou o prompt for bloqueado, executar `/startup`
+- se a sessao vai terminar, nao sair do CLI antes de rodar `/close-session`
+
+## Hooks de sessao
+
+Eventos configurados em `.claude/settings.json`:
+
+- `SessionStart`: cria ou repara `memory/_session-state.json`, garante memoria do dia e injeta contexto minimo
+- `UserPromptSubmit`: bloqueia prompts quando a sessao nao estiver validada ou ja tiver sido fechada logicamente
+- `SessionEnd`: registra a saida e marca quando o CLI foi encerrado sem `/close-session`
+
+Uso recomendado:
+
+- confiar nos hooks para enforcement leve e automatico
+- usar `/startup` para auditoria manual ou reabertura de contexto
+- usar `/close-session` para fechamento rico com memoria e relatorio
 
 ---
 
@@ -120,7 +161,7 @@ Convencao:
 
 - raiz local: `.wt/`
 - padrao de caminho: `.wt/<repo-em-kebab-case>/<objetivo-ou-branch>`
-- prefixo de branch recomendado: `agent/<objetivo>`
+- prefixo de branch recomendado: convencional (`feat/`, `fix/`, `chore/`, `refactor/`, `docs/`)
 - uma worktree por contexto ativo relevante
 
 Inventario minimo por worktree:
@@ -139,7 +180,7 @@ Worktrees criadas a partir da raiz do workspace (para isolar trabalho no proprio
 
 ```bash
 # Criar com nova branch
-git worktree add .wt/workspace/<objetivo> -b agent/<objetivo>
+git worktree add .wt/workspace/<objetivo> -b <prefixo>/<objetivo>
 
 # Criar com branch existente
 git worktree add .wt/workspace/<objetivo> <branch>
@@ -151,7 +192,7 @@ Repos em `repo/<nome>/` sao git repos separados. Para criar worktree de um repo 
 
 ```bash
 # A partir da raiz do repo interno
-git -C repo/<nome> worktree add ../../.wt/<nome-kebab>/<objetivo> -b agent/<objetivo>
+git -C repo/<nome> worktree add ../../.wt/<nome-kebab>/<objetivo> -b <prefixo>/<objetivo>
 
 # Com branch existente
 git -C repo/<nome> worktree add ../../.wt/<nome-kebab>/<objetivo> <branch>

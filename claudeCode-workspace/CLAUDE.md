@@ -13,10 +13,39 @@ A fonte canonica dos MCPs/plugins habilitados neste workspace e `.claude/setting
 
 No inicio de cada sessao principal:
 
-1. Ler `memory/YYYY-MM-DD.md` de hoje e, se existir, o de ontem
-2. Ler `.claude/settings.json` para confirmar MCPs/plugins habilitados
-3. Executar `/heartbeat` para verificar o estado operacional
-4. Nao assumir contexto de sessao anterior sem verificar memoria
+1. Os hooks em `.claude/settings.json` devem auto-inicializar a sessao no evento `SessionStart`
+2. A auto-inicializacao deve gravar o marcador local `memory/_session-state.json`
+3. Antes de responder qualquer solicitacao operacional, considerar a sessao valida apenas se:
+   - o marcador existir
+   - `date` for a data de hoje
+   - `startup_done` for `true`
+   - `close_done` for `false`
+4. Se o estado nao estiver valido, executar `/startup` antes de prosseguir
+5. O `/startup` deve:
+   - ler `memory/YYYY-MM-DD.md` de hoje e, se existir, o de ontem
+   - ler o relatorio de sessao mais recente em `Relatorios/agent-sessions/`
+   - ler `.claude/settings.json` para confirmar MCPs/plugins habilitados
+   - executar `/heartbeat` para verificar o estado operacional
+   - reparar ou recriar `memory/_session-state.json`
+   - responder com contexto herdado, riscos e proximo passo recomendado
+6. Se `/startup` nao puder ser usado, executar manualmente os passos acima
+7. Nao assumir contexto de sessao anterior sem verificar memoria e relatorio
+
+## Gate de sessao
+
+Hooks e comandos de sessao devem trabalhar juntos:
+
+- `SessionStart` auto-inicializa e injeta contexto minimo
+- `UserPromptSubmit` bloqueia prompts quando o estado da sessao estiver invalido
+- `SessionEnd` registra encerramento leve e detecta saida sem `/close-session`
+- `/startup` e o fallback manual para auditoria completa e reabertura de contexto
+- `/close-session` e o fechamento rico obrigatorio antes de sair do Claude CLI
+
+Se o usuario enviar uma mensagem avulsa logo ao abrir o Claude CLI, o fluxo esperado e:
+
+1. o hook validar ou criar o marcador
+2. o hook injetar o contexto minimo da sessao
+3. se houver falha ou estado invalido, bloquear o prompt e exigir `/startup`
 
 ## Objetivo
 
@@ -229,13 +258,16 @@ Apos um PR ser aprovado e mergeado:
 
 Ao finalizar cada sessao ou execucao de agente:
 
-1. Atualizar a memoria diaria com `/daily-memory`.
-2. Salvar resumo da sessao em `Relatorios/agent-sessions/YYYY-MM-DD-session.md` com:
-   - objetivo
-   - arquivos alterados
-   - comandos executados
-3. Avaliar se alguma decisao duravel deve subir para `MEMORY.md`.
-4. Verificar worktrees elegiveis para limpeza.
+1. Executar `/close-session` como ultimo comando antes de sair do Claude CLI.
+2. O `/close-session` deve:
+   - atualizar a memoria diaria com `/daily-memory`
+   - salvar ou atualizar o resumo da sessao em `Relatorios/agent-sessions/YYYY-MM-DD-session.md`
+   - avaliar se alguma decisao duravel deve subir para `MEMORY.md`
+   - verificar worktrees elegiveis para limpeza
+   - atualizar `memory/_session-state.json` com `close_done=true`
+   - responder com checklist final e pendencias remanescentes
+3. O hook `SessionEnd` nao substitui `/close-session`; ele serve apenas para registrar a saida e detectar encerramento sem fechamento completo.
+4. Se `/close-session` nao puder ser usado, executar manualmente os passos acima.
 
 ## Regra final
 

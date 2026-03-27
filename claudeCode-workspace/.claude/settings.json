@@ -10,6 +10,41 @@
         ],
         "deny": []
     },
+    "hooks": {
+        "SessionStart": [
+            {
+                "matcher": "startup|resume|clear",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"$root = if ($env:CLAUDE_PROJECT_DIR) { $env:CLAUDE_PROJECT_DIR } else { $PWD.Path }; & (Join-Path $root '.claude\\hooks\\session-start.ps1')\""
+                    }
+                ]
+            }
+        ],
+        "UserPromptSubmit": [
+            {
+                "matcher": "",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"$root = if ($env:CLAUDE_PROJECT_DIR) { $env:CLAUDE_PROJECT_DIR } else { $PWD.Path }; & (Join-Path $root '.claude\\hooks\\session-guard.ps1')\""
+                    }
+                ]
+            }
+        ],
+        "SessionEnd": [
+            {
+                "matcher": "",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"$root = if ($env:CLAUDE_PROJECT_DIR) { $env:CLAUDE_PROJECT_DIR } else { $PWD.Path }; & (Join-Path $root '.claude\\hooks\\session-end.ps1')\""
+                    }
+                ]
+            }
+        ]
+    },
     "pluginConfigs": {
         "serena@claude-plugins-official": {
             "mcpServers": {
@@ -20,7 +55,7 @@
                         "serena",
                         "start-mcp-server",
                         "--project-path",
-                        "C:/Sistema/claudeCode-workspace"
+                        "C:/Sistema/ClaudeCode-Starter-Pack/claudeCode-workspace"
                     ]
                 }
             }

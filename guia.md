@@ -28,8 +28,11 @@ ClaudeCode-Starter-Pack/
 |-- guia.md
 `-- claudeCode-workspace/
     |-- .claude/
+    |   |-- hooks/
+    |   `-- commands/
     |-- .serena/
     |-- memory/
+    |   `-- _session-state.json
     |-- repo/
     |   `-- CLAUDE.md
     |-- .gitignore
@@ -52,7 +55,9 @@ ClaudeCode-Starter-Pack/
 | `claudeCode-workspace/MEMORY.md` | Memoria duravel. So entra o que precisa sobreviver entre sessoes. |
 | `claudeCode-workspace/HEARTBEAT.md` | Checklist curto de saude operacional. |
 | `claudeCode-workspace/memory/` | Memoria diaria no formato `YYYY-MM-DD.md`. |
+| `claudeCode-workspace/memory/_session-state.json` | Marcador local de abertura e fechamento da sessao. |
 | `claudeCode-workspace/.claude/settings.json` | Permissoes e plugins habilitados. Fonte canonica dos MCPs. |
+| `claudeCode-workspace/.claude/hooks/` | Hooks nativos do Claude Code para startup, guarda de prompt e encerramento. |
 | `claudeCode-workspace/.claude/commands/` | Slash commands do workspace. |
 | `claudeCode-workspace/.claude/agents/` | Subagentes especializados (review-deep, explain, agent-router, test-runner). |
 | `claudeCode-workspace/Relatorios/` | Artefatos canonicos: backlog, status do supervisor, sessoes de agente. |
@@ -227,6 +232,10 @@ No estado atual deste pack, ele:
 
 - libera leitura, escrita, edicao, glob e grep
 - habilita comandos basicos de bash para `git`, `ls` e `cat`
+- registra hooks nativos de sessao:
+  - `SessionStart`
+  - `UserPromptSubmit`
+  - `SessionEnd`
 - habilita estes plugins:
   - `telegram@claude-plugins-official`
   - `serena@claude-plugins-official`
@@ -298,12 +307,13 @@ Ele faz o Claude:
 
 ## 7. Startup obrigatorio de cada sessao
 
-O `CLAUDE.md` do workspace define um startup obrigatorio. No inicio de cada sessao principal, o Claude deve:
+O `CLAUDE.md` do workspace define um gate de sessao. No fluxo atual:
 
-1. Ler `memory/YYYY-MM-DD.md` de hoje e, se existir, a de ontem.
-2. Ler `.claude/settings.json` para confirmar os MCPs habilitados.
-3. Executar `/heartbeat`.
-4. Nao assumir contexto de sessao anterior sem verificar memoria.
+1. O hook `SessionStart` auto-inicializa a sessao.
+2. O hook cria ou atualiza `memory/_session-state.json`.
+3. Se o estado estiver invalido, o hook `UserPromptSubmit` bloqueia o prompt e exige `/startup`.
+4. O comando `/startup` funciona como auditoria manual e reparo da sessao.
+5. O Claude nao deve assumir contexto anterior sem verificar memoria, relatorio de sessao e heartbeat.
 
 ### O que fazer no primeiro dia
 
@@ -332,9 +342,9 @@ O arquivo deve registrar:
 ### Inicio da sessao
 
 1. Abra o Claude Code na raiz do workspace.
-2. Confirme que o `CLAUDE.md` do workspace esta atualizado.
-3. Rode `/heartbeat`.
-4. Leia a memoria do dia e a do dia anterior.
+2. Deixe o hook `SessionStart` auto-inicializar a sessao.
+3. Se houver bloqueio de prompt ou duvida de contexto, rode `/startup`.
+4. Confira o resumo retornado e o estado do workspace.
 5. Se necessario, abra ou retome uma worktree.
 
 ### Durante o trabalho
@@ -386,10 +396,11 @@ Apos um PR ser mergeado:
 ### Encerramento da sessao
 
 1. Rode testes, linters e verifique que o projeto compila.
-2. Atualize a memoria diaria com `/daily-memory`.
-3. Salve um resumo da sessao em `Relatorios/agent-sessions/YYYY-MM-DD-session.md` com objetivo, arquivos alterados e comandos executados.
+2. Rode `/close-session`.
+3. Atualize a memoria diaria e o relatorio de sessao.
 4. Promova para `MEMORY.md` apenas o que for realmente duravel.
 5. Verifique se alguma worktree pode ser limpa.
+6. Ao fechar o CLI, deixe o hook `SessionEnd` registrar o encerramento leve.
 
 ## 9. Slash commands incluidos no pack
 
@@ -444,6 +455,32 @@ Fluxo esperado:
 - criar se necessario
 - registrar fatos, decisoes, riscos e links
 - avaliar promocao para `MEMORY.md`
+
+### `/startup`
+
+Objetivo:
+
+- auditar e reparar manualmente o estado da sessao
+
+Fluxo esperado:
+
+- ler memoria e relatorio mais recentes
+- verificar `.claude/settings.json`
+- verificar ou recriar `memory/_session-state.json`
+- executar `/heartbeat`
+
+### `/close-session`
+
+Objetivo:
+
+- fazer o fechamento rico da sessao antes de sair do Claude CLI
+
+Fluxo esperado:
+
+- atualizar memoria diaria
+- atualizar `Relatorios/agent-sessions/YYYY-MM-DD-session.md`
+- marcar `close_done=true` em `memory/_session-state.json`
+- revisar pendencias e worktrees
 
 ### `/commit-commands:commit`
 
@@ -724,21 +761,22 @@ Use esta lista para validar que a adocao ficou completa:
 6. `.serena/project.yml` foi ajustado se voce quiser language servers.
 7. Cada repo de codigo recebeu seu proprio `CLAUDE.md`.
 8. Os placeholders de cada repo foram substituidos.
-9. O startup obrigatorio foi entendido: memoria de hoje, memoria de ontem, `settings.json`, `/heartbeat`.
-10. O time combinou uma convencao unica para worktrees.
+9. Os hooks de sessao foram revisados em `.claude/settings.json`.
+10. O startup obrigatorio foi entendido: hooks + `/startup` como fallback manual.
+11. O time combinou uma convencao unica para worktrees.
 
 ## 16. Exemplo de rotina completa
 
 Um uso tipico pode ser assim:
 
 1. Abrir `C:\Work\MeuWorkspace` no Claude Code.
-2. Conferir `memory/2026-03-26.md`.
-3. Rodar `/heartbeat`.
+2. Deixar o hook `SessionStart` inicializar a sessao.
+3. Se necessario, rodar `/startup`.
 4. Escolher o repo `api`.
 5. Se necessario, abrir `.wt/api/feat-ajuste-login`.
 6. Trabalhar respeitando `repo/api/CLAUDE.md`.
 7. Rodar build, test e lint do repo.
-8. Atualizar `/daily-memory`.
+8. Rodar `/close-session`.
 9. Promover alguma decisao duravel para `MEMORY.md`.
 10. Avaliar limpeza da worktree se a tarefa tiver terminado.
 
