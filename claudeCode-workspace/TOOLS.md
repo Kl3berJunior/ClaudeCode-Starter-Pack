@@ -19,6 +19,7 @@ Fonte canonica: `.claude/settings.json`
 - `playwright`: automacao de browser para validacao funcional e visual
 - `context-mode`: organizacao de contexto para tarefas longas, multi-etapa ou com historico grande
 - `telegram`: notificacoes e interacao remota quando o pareamento do bot estiver configurado
+- `commit-commands`: fluxo padrao de commit, push e abertura de PR
 
 ## Heuristica de uso
 
@@ -38,50 +39,83 @@ Fonte canonica: `.claude/settings.json`
 - memoria duravel: `MEMORY.md`
 - contrato operacional: `CLAUDE.md`
 - worktrees locais: `.wt/`
+- backlog de tasks: `Relatorios/Swarm/task-backlog.md`
+- status do supervisor: `Relatorios/Swarm/supervisor-status.md`
+- relatorios de sessao: `Relatorios/agent-sessions/`
+
+## Testes
+
+Executar testes de API (PowerShell):
+```powershell
+pwsh tests/<repo>/<modulo>/test_<cenario>.ps1
+```
+
+Executar testes de frontend (Playwright):
+```bash
+npx playwright test tests/<repo>/
+npx playwright test tests/<repo>/<modulo>/
+npx playwright test tests/<repo>/ --ui    # modo visual
+```
 
 ## Worktrees
 
 Convencao:
 
 - raiz local: `.wt/`
-- padrao de caminho: `.wt/<repo>/<objetivo-ou-branch>`
+- padrao de caminho: `.wt/<repo-kebab-case>/<objetivo-ou-branch>`
 - uma worktree por contexto ativo relevante
-
-Auditoria:
-
-- listar worktrees: `git worktree list --porcelain`
-- verificar status de uma worktree: `git -C .wt/<repo>/<objetivo-ou-branch> status --short --branch`
-- podar metadata orfa: `git worktree prune`
-
-Criacao:
-
-- nova branch em worktree dedicada: `git worktree add .wt/<repo>/<objetivo-ou-branch> -b <branch>`
-- usar branch existente em worktree dedicada: `git worktree add .wt/<repo>/<objetivo-ou-branch> <branch>`
-
-Limpeza:
-
-- remover worktree limpa: `git worktree remove .wt/<repo>/<objetivo-ou-branch>`
-- nunca remover worktree com mudancas nao commitadas sem confirmar antes
+- prefixo de branch recomendado: `agent/<objetivo>`
 
 Inventario minimo por worktree:
 
-- repo
-- branch
-- objetivo
-- dono ou task
-- data da ultima atividade
+| Campo | Descricao |
+|-------|-----------|
+| repo | nome do repositorio em kebab-case |
+| branch | branch associada |
+| objetivo | o que esta sendo feito |
+| dono | task ou agente responsavel |
+| ultima atividade | data da ultima alteracao |
 
-Formato sugerido:
+Comandos:
 
-## Repo `__REPO_NAME__`
+```bash
+# Auditoria
+git worktree list --porcelain
+git -C .wt/<repo>/<objetivo> status --short --branch
 
-- path: `__WORKSPACE_ROOT__/repo/__REPO_NAME__`
-- worktree-root: `.wt/__REPO_NAME__/`
-- build: `__COMMAND__`
-- test: `__COMMAND__`
-- lint: `__COMMAND__`
-- publish: `__COMMAND__`
-- run: `__COMMAND__`
-- notes: `__NOTES__`
+# Criar com nova branch
+git worktree add .wt/<repo>/<objetivo> -b agent/<objetivo>
+
+# Criar com branch existente
+git worktree add .wt/<repo>/<objetivo> <branch>
+
+# Remover worktree limpa
+git worktree remove .wt/<repo>/<objetivo>
+
+# Podar metadata orfa
+git worktree prune
+```
+
+Regras:
+
+- nunca remover worktree com mudancas nao commitadas sem confirmar
+- nunca remover o worktree principal
+- sempre rodar `git worktree prune` apos remover
+
+## Formato de entrada por repo
+
+Adicione uma secao por repositorio registrado:
+
+```
+## Repo <nome-do-repo>
+
+- path: `repo/<nome-do-repo>`
+- worktree-root: `.wt/<nome-do-repo>/`
+- build: <comando>
+- test: <comando>
+- lint: <comando>
+- run: <comando>
+- notes: <observacoes>
+```
 
 ---
