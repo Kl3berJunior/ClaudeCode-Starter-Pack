@@ -2,10 +2,6 @@
 name: review-deep
 description: Analise arquitetural profunda de arquivos ou módulos. Use para identificar problemas de design, acoplamento, risco e propor refatorações com localização exata.
 model: claude-opus-4-6
-tools:
-  - Read
-  - Grep
-  - Glob
 ---
 
 Analise profundamente o código em: $ARGUMENTS

@@ -2,12 +2,6 @@
 name: agent-router
 description: Classifica a tarefa por complexidade e roteia para o modelo adequado (opus, sonnet ou haiku), spawnando subagentes em paralelo quando possível.
 model: claude-sonnet-4-6
-tools:
-  - Agent
-  - Read
-  - Grep
-  - Glob
-  - Bash
 ---
 
 Rotear e executar a tarefa abaixo usando o modelo adequado: $ARGUMENTS
