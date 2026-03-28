@@ -80,6 +80,8 @@ Importante:
 - `memory/`, `.wt/` e `.serena/memories/` estao no `.gitignore` — sao dados locais nao versionados
 - `Relatorios/` e versionado — `task-backlog.md`, `supervisor-status.md` e `agent-sessions/` sao arquivos canonicos
 
+- o starter pack deve comecar sem memorias diarias e sem relatorios de sessao datados; esses arquivos sao gerados no uso real
+
 ## 4. Como instalar o pack em um workspace real
 
 ### Passo 1. Escolha a raiz do workspace
@@ -164,6 +166,8 @@ Troque o placeholder:
 
 - `__WORKSPACE_ROOT__` pelo caminho real do seu workspace
 
+Esse mesmo placeholder tambem deve ser ajustado em `.claude/settings.json`, no `--project-path` do Serena.
+
 Esse arquivo define:
 
 - arquivos importados automaticamente
@@ -231,11 +235,12 @@ Arquivo:
 No estado atual deste pack, ele:
 
 - libera leitura, escrita, edicao, glob e grep
-- habilita comandos basicos de bash para `git`, `ls` e `cat`
+- habilita `git` via `Bash(git:*)`
 - registra hooks nativos de sessao:
   - `SessionStart`
   - `UserPromptSubmit`
   - `SessionEnd`
+- configura o Serena com `--project-path __WORKSPACE_ROOT__`, que precisa ser trocado pelo caminho real do workspace
 - habilita estes plugins:
   - `telegram@claude-plugins-official`
   - `serena@claude-plugins-official`
@@ -320,7 +325,7 @@ O `CLAUDE.md` do workspace define um gate de sessao. No fluxo atual:
 Se ainda nao existir memoria diaria, crie:
 
 ```text
-memory/2026-03-26.md
+memory/YYYY-MM-DD.md
 ```
 
 ou use o comando:

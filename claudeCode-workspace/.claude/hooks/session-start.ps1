@@ -76,7 +76,10 @@ if (Test-Path -LiteralPath $reportsDir) {
     if (Test-Path -LiteralPath $todayReport) {
         $latestReport = Get-Item -LiteralPath $todayReport
     } else {
-        $latestReport = Get-ChildItem -LiteralPath $reportsDir -File | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+        $latestReport = Get-ChildItem -LiteralPath $reportsDir -File |
+            Where-Object { $_.Name -like "*-session.md" } |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
     }
 
     if ($latestReport) {

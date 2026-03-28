@@ -55,7 +55,7 @@
                         "serena",
                         "start-mcp-server",
                         "--project-path",
-                        "C:/Sistema/ClaudeCode-Starter-Pack/claudeCode-workspace"
+                        "__WORKSPACE_ROOT__"
                     ]
                 }
             }

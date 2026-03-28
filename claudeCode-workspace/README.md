@@ -38,6 +38,10 @@ claudeCode-workspace/
 | `telegram` | Notificacoes e interacao remota via bot |
 | `commit-commands` | Fluxo padrao de commit, push e PR |
 
+Observacao:
+
+- o starter pack deve nascer sem memoria diaria ou relatorios datados; esses artefatos sao gerados ao longo do uso por hooks e commands
+
 ## Comandos disponiveis
 
 | Comando | Descricao |
@@ -131,13 +135,15 @@ claudeCode-workspace/
 - Marcador local: `memory/_session-state.json` - estado de abertura e fechamento da sessao
 - Duravel: `MEMORY.md` - contratos e decisoes que transcendem a sessao
 - Operacional: `TOOLS.md` - caminhos, comandos e ferramentas por repo
+- Relatorios de sessao: `Relatorios/agent-sessions/YYYY-MM-DD-session.md` - criados por `/close-session`, sem exemplos datados no template
 
 ## Adicionar um repositorio
 
 1. Copiar `repo/CLAUDE.md` para o repo alvo
 2. Substituir os placeholders: `__REPO_NAME__`, `__BUILD_COMMAND__`, `__TEST_COMMAND__`, `__LINT_COMMAND__`
-3. Registrar o repo em `TOOLS.md` com caminho, comandos e worktree-root
-4. Criar `Relatorios/<nome-do-repo>/` para artefatos do repo
+3. Ajustar `__WORKSPACE_ROOT__` tambem em `.claude/settings.json` para o `--project-path` do Serena
+4. Registrar o repo em `TOOLS.md` com caminho, comandos e worktree-root
+5. Criar `Relatorios/<nome-do-repo>/` para artefatos do repo
 
 ## Seguranca
 

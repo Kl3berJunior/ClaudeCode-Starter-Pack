@@ -1,4 +1,4 @@
-# ClaudeCode-Stater-Pack - Resumo
+# ClaudeCode-Starter-Pack - Resumo
 
 ## O que e
 
@@ -14,7 +14,7 @@ O pack tem duas partes:
 ## Estrutura de arquivos
 
 ```text
-ClaudeCode-Stater-Pack/
+ClaudeCode-Starter-Pack/
 `-- claudeCode-workspace/
     |-- .claude/
     |   |-- settings.json            # Permissoes locais e MCPs/plugins habilitados
@@ -26,8 +26,12 @@ ClaudeCode-Stater-Pack/
     |   |   `-- test-runner.md       # Agente Sonnet: criacao e execucao de testes (PowerShell + Playwright)
     |   `-- commands/
     |       |-- backlog.md           # Slash command para listar e atualizar backlog operacional
+    |       |-- close-session.md     # Slash command para fechamento rico da sessao
     |       |-- daily-memory.md      # Slash command para registrar memoria diaria
+    |       |-- delegate.md          # Slash command para internalizar issue/PR no backlog
+    |       |-- gh-project.md        # Slash command para consultar GitHub Projects
     |       |-- heartbeat.md         # Slash command para checagem completa de saude operacional (7 itens)
+    |       |-- startup.md           # Slash command para auditoria e reparo manual da sessao
     |       `-- worktree.md          # Slash command para auditar e operar worktrees (workspace e repo)
     |-- .serena/
     |   |-- .gitignore               # Ignora estado local do Serena dentro da pasta
@@ -249,7 +253,7 @@ Sessao inicia
 1. Copie `claudeCode-workspace/` para seu workspace.
 2. Preencha `USER.md` e `TOOLS.md`.
 3. Coloque seus repositorios dentro de `repo/` no workspace, copie `claudeCode-workspace/repo/CLAUDE.md` para cada repo e substitua os placeholders.
-4. Ajuste `__WORKSPACE_ROOT__`.
+4. Ajuste `__WORKSPACE_ROOT__` nos arquivos com placeholder, incluindo o `--project-path` do Serena em `.claude/settings.json`.
 5. Revise `.claude/settings.json`.
 6. Abra o Claude Code no workspace.
 
