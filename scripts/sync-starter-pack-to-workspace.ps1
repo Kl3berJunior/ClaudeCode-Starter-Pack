@@ -217,7 +217,9 @@ function Merge-BulletSection(
 
     $targetBody = $targetMatch.Groups['body'].Value.TrimEnd("`r", "`n")
     $missingBullets = @(
-        $sourceBullets | Where-Object { $targetBody -notlike "*$_*" }
+        $sourceBullets | Where-Object {
+            -not $targetBody.Contains($_, [System.StringComparison]::OrdinalIgnoreCase)
+        }
     )
 
     if ($missingBullets.Count -eq 0) {
@@ -299,7 +301,9 @@ function Merge-Memory() {
     )
 
     $missingBullets = @(
-        $sourceBullets | Where-Object { $targetContent -notlike "*$_*" }
+        $sourceBullets | Where-Object {
+            -not $targetContent.Contains($_, [System.StringComparison]::OrdinalIgnoreCase)
+        }
     )
 
     $mergedContent = $targetContent
