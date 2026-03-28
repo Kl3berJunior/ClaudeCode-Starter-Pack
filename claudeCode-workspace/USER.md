@@ -30,7 +30,7 @@ Nao colocar aqui segredos, tokens ou senhas.
 ## Politica de worktrees
 
 - raiz padrao: `.wt/`
-- convencao de nome: `.wt/<repo-em-kebab-case>/<objetivo>`
+- convencao de nome: `.wt/workspace/<objetivo>` para trabalho no workspace, `.wt/<repo-em-kebab-case>/<objetivo>` para repos internos
 - abrir nova worktree quando houver tarefa paralela ou isolamento de contexto necessario
 - auditar worktrees no heartbeat de cada sessao
 - nunca remover worktree com mudancas nao commitadas sem confirmar antes
