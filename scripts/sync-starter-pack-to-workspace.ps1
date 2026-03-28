@@ -53,9 +53,10 @@ function Replace-Match([string]$Content, [System.Text.RegularExpressions.Match]$
 }
 
 function Convert-WorkspaceText([string]$Content) {
-    return $Content.
-        Replace('__WORKSPACE_ROOT__', $resolvedTargetRootUnix).
-        Replace($sourceWorkspaceRootUnix, $resolvedTargetRootUnix)
+    # single-pass para evitar substituicao em cascata caso os paths se sobreponham
+    $pattern = [System.Text.RegularExpressions.Regex]::Escape('__WORKSPACE_ROOT__') + '|' +
+               [System.Text.RegularExpressions.Regex]::Escape($sourceWorkspaceRootUnix)
+    return [System.Text.RegularExpressions.Regex]::Replace($Content, $pattern, { $resolvedTargetRootUnix })
 }
 
 function Copy-FileFromSource([string]$RelativePath) {
@@ -93,7 +94,7 @@ function Get-RelativeFiles([string]$RelativeDirectory, [string]$Filter) {
         }
 }
 
-function Get-JsonArray([object]$JsonObject, [string]$PropertyName) {
+function Get-PermissionsArray([object]$JsonObject, [string]$PropertyName) {
     if ($null -eq $JsonObject) {
         return @()
     }
@@ -143,8 +144,8 @@ function Merge-SettingsLocal() {
     $sourceJson = if (Test-Path -LiteralPath $sourcePath) { (Read-Utf8 $sourcePath | ConvertFrom-Json) } else { $null }
     $targetJson = if (Test-Path -LiteralPath $targetPath) { (Read-Utf8 $targetPath | ConvertFrom-Json) } else { $null }
 
-    $allow = Merge-UniqueStrings (Get-JsonArray $targetJson 'allow') (Get-JsonArray $sourceJson 'allow')
-    $deny = Merge-UniqueStrings (Get-JsonArray $targetJson 'deny') (Get-JsonArray $sourceJson 'deny')
+    $allow = Merge-UniqueStrings (Get-PermissionsArray $targetJson 'allow') (Get-PermissionsArray $sourceJson 'allow')
+    $deny = Merge-UniqueStrings (Get-PermissionsArray $targetJson 'deny') (Get-PermissionsArray $sourceJson 'deny')
 
     $payload = [ordered]@{
         permissions = [ordered]@{
