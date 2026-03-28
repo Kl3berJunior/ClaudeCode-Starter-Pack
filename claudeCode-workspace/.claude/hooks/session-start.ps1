@@ -5,14 +5,14 @@ $ErrorActionPreference = "Stop"
 $hookInput = Read-HookInput
 $workspaceRoot = Get-WorkspaceRoot
 $memoryDir = Get-SessionMemoryDir -WorkspaceRoot $workspaceRoot
-$reportsDir = Join-Path $workspaceRoot "Relatorios\agent-sessions"
+$reportsDir = Join-Path $workspaceRoot "Relatorios" "agent-sessions"
 $today = Get-Date -Format "yyyy-MM-dd"
 $yesterday = (Get-Date).AddDays(-1).ToString("yyyy-MM-dd")
 $todayMemory = Join-Path $memoryDir "$today.md"
 $yesterdayMemory = Join-Path $memoryDir "$yesterday.md"
 $statePath = Get-SessionStatePath -WorkspaceRoot $workspaceRoot
 
-Ensure-Directory -Path $memoryDir
+Initialize-Directory -Path $memoryDir
 
 if (-not (Test-Path -LiteralPath $todayMemory)) {
     Set-Content -LiteralPath $todayMemory -Value "# $today`r`n"

@@ -15,9 +15,11 @@ Passos:
 3. Criar ou atualizar `Relatorios/agent-sessions/YYYY-MM-DD-session.md`
    - se o arquivo do dia nao existir, criar
    - se ja existir, acrescentar uma nova secao ou continuacao em vez de apagar o historico
-4. Atualizar `memory/_session-state.json`
-   - garantir `close_done=true`
-   - registrar `close_at`
+4. Atualizar `memory/_session-state.json` via script PowerShell:
+   - Executar `.claude/hooks/session-close.ps1` usando a ferramenta Bash com o comando:
+     `powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".claude/hooks/session-close.ps1"`
+   - O script le o estado atual, define `close_done=true` e `close_at` com timestamp ISO completo, e salva preservando todos os campos existentes (startup_at, session_id, branch, etc.)
+   - Nao editar o JSON manualmente — sempre usar o script para evitar perda de campos
 5. Registrar no relatorio:
    - objetivo
    - arquivos alterados

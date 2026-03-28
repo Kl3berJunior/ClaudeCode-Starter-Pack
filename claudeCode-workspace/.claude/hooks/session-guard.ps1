@@ -9,7 +9,7 @@ function Allow-Prompt {
         return $true
     }
 
-    return $Prompt -match '^\s*/(startup|close-session|help|hooks|clear|resume)\b'
+    return $Prompt -match '^\s*/(startup|close-session|help|hooks|clear|resume|heartbeat|backlog)\b'
 }
 
 $hookInput = Read-HookInput

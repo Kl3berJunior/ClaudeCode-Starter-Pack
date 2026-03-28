@@ -10,7 +10,7 @@ $today = Get-Date -Format "yyyy-MM-dd"
 $sessionId = Get-HookInputValue -HookInput $hookInput -PropertyName "session_id" -Default ""
 $reason = Get-HookInputValue -HookInput $hookInput -PropertyName "reason" -Default "other"
 
-Ensure-Directory -Path $memoryDir
+Initialize-Directory -Path $memoryDir
 
 $state = Read-SessionState -StatePath $statePath
 if (-not $state) {
@@ -26,3 +26,7 @@ $state.session_end_reason = $reason
 $state.ended_without_close_session = (-not $state.close_done)
 
 Save-SessionState -State $state -StatePath $statePath
+
+$context = "Sessao encerrada. ended_without_close_session=$($state.ended_without_close_session). reason=$reason."
+$output = New-HookOutput -HookEventName "SessionEnd" -AdditionalContext $context
+Write-HookJson -Payload $output

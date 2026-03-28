@@ -29,7 +29,7 @@ function Get-SessionStatePath {
     return (Join-Path (Get-SessionMemoryDir -WorkspaceRoot $WorkspaceRoot) "_session-state.json")
 }
 
-function Ensure-Directory {
+function Initialize-Directory {
     param([string]$Path)
 
     if (-not (Test-Path -LiteralPath $Path)) {
