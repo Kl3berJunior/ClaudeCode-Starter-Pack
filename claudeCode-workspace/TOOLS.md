@@ -113,8 +113,8 @@ Os commands devem acompanhar o fluxo da sessao. Evite usar comandos fora de orde
 | Triagem GitHub | `/gh-project` | quando a demanda ainda esta no GitHub Project e precisa ser descoberta ou filtrada | itens candidatos para delegacao ou acao seguinte |
 | Entrada no backlog | `/delegate` | depois de identificar issue ou PR no GitHub que deve virar trabalho rastreavel no workspace | task criada ou atualizada em `Relatorios/Swarm/task-backlog.md` |
 | Isolamento de execucao | `/worktree <acao>` | quando a task pede isolamento de branch ou paralelo limpo no workspace ou em repo interno | worktree rastreavel pronta para execucao |
-| Finalizacao local | `/commit-commands:commit` | depois de validar as mudancas e deixar o stage pronto para commit | commit local criado com mensagem gerada a partir das mudancas staged |
-| Finalizacao com PR | `/commit-commands:commit-push-pr` | quando a entrega ja pode virar push e PR com revisao | commit, push e PR abertos em sequencia |
+| Finalizacao local | `/commit-commands:commit` | depois de validar as mudancas e deixar o stage pronto para commit | commit local criado com titulo convencional e corpo rico a partir das mudancas staged |
+| Finalizacao com PR | `/commit-commands:commit-push-pr` | quando a entrega ja pode virar push e PR com revisao | commit, push e PR abertos em sequencia com descricao rica no PR |
 | Limpeza pos-merge | `/commit-commands:clean_gone` | apos merges e sincronizacao local, para remover branches `[gone]` e worktrees associadas | limpeza segura de lixo local apos merge |
 | Registro durante a sessao | `/daily-memory` | em sessoes longas, mudancas operacionais relevantes ou antes de contexto se perder | fatos, riscos e decisoes do dia registrados |
 | Fechamento | `/close-session` | como ultimo comando antes de sair do CLI | memoria, relatorio de sessao e marcador local atualizados |
@@ -141,7 +141,8 @@ Os commands devem acompanhar o fluxo da sessao. Evite usar comandos fora de orde
 3. execucao normal da tarefa com MCPs e agentes adequados
 4. `/commit-commands:commit` quando as mudancas ja estiverem validadas e staged
 5. `/commit-commands:commit-push-pr` quando a entrega puder seguir para revisao
-6. `/daily-memory` se a sessao ficar longa, mudar de contexto ou gerar decisao relevante
+6. garantir que commit e PR tenham contexto, mudancas, validacao e risco descritos
+7. `/daily-memory` se a sessao ficar longa, mudar de contexto ou gerar decisao relevante
 
 **4. Encerrar a sessao**
 
@@ -163,7 +164,25 @@ Os commands devem acompanhar o fluxo da sessao. Evite usar comandos fora de orde
 - `/worktree` deve vir depois que a task estiver clara, e preferencialmente depois de existir backlog ou objetivo rastreavel.
 - `/commit-commands:commit` e `/commit-commands:commit-push-pr` entram so depois de validar a mudanca e preparar o stage.
 - `/commit-commands:commit-push-pr` nao substitui a regra de review; ele so abre o PR.
+- commit e PR devem registrar contexto, escopo, validacao e risco de forma legivel.
 - `/daily-memory` pode ser usado no meio da sessao, mas `/close-session` continua sendo o fechamento obrigatorio.
+
+### Padrao de descricao rica
+
+Commit:
+
+- primeira linha com conventional commit
+- corpo curto explicando contexto ou problema
+- lista curta das mudancas principais
+- validacao executada ou motivo da ausencia
+
+PR:
+
+- resumo do contexto e do objetivo
+- principais mudancas por area
+- validacao executada
+- riscos, impacto e pendencias
+- links para task, issue ou artefato quando houver
 
 ## Hooks de sessao
 

@@ -50,8 +50,8 @@ claudeCode-workspace/
 | `/worktree <acao>` | Cria, lista ou remove worktrees em `.wt/` |
 | `/gh-project <acao>` | Consulta projetos do GitHub via `gh project` |
 | `/delegate <numero> <org/repo>` | Le issue ou PR do GitHub e cria ou atualiza task no backlog |
-| `/commit-commands:commit` | Cria commit local a partir das mudancas staged |
-| `/commit-commands:commit-push-pr` | Cria commit, faz push e abre PR |
+| `/commit-commands:commit` | Cria commit local com titulo convencional e corpo rico |
+| `/commit-commands:commit-push-pr` | Cria commit, faz push e abre PR com descricao rica |
 | `/commit-commands:clean_gone` | Limpa branches locais `[gone]` e worktrees associadas |
 
 ## Fluxo de commands
@@ -103,8 +103,8 @@ claudeCode-workspace/
 3. Usar serena para navegar     - evitar leitura cega
 4. Usar context7 para libs      - nao assumir contratos
 5. Validar com testes e lint    - antes de commitar
-6. /commit-commands:commit      - criar commit local com mudancas staged
-7. /commit-commands:commit-push-pr - quando a entrega ja puder virar PR
+6. /commit-commands:commit      - criar commit local com descricao rica
+7. /commit-commands:commit-push-pr - abrir PR com descricao rica quando a entrega ja puder seguir
 ```
 
 ### Encerramento de sessao
@@ -122,6 +122,7 @@ claudeCode-workspace/
 - Branch protegido: `main` nunca recebe commit direto
 - Prefixos: `feat/`, `fix/`, `refactor/`, `chore/`, `docs/`
 - Commits: conventional commits (`feat: ...`, `fix: ...`)
+- Commit e PR: devem ter descricao rica com contexto, mudancas, validacao e risco
 - PRs: sempre abrir PR e aguardar review explicita antes de merge
 
 ## Memoria
