@@ -344,8 +344,22 @@ O arquivo deve registrar:
 1. Abra o Claude Code na raiz do workspace.
 2. Deixe o hook `SessionStart` auto-inicializar a sessao.
 3. Se houver bloqueio de prompt ou duvida de contexto, rode `/startup`.
-4. Confira o resumo retornado e o estado do workspace.
-5. Se necessario, abra ou retome uma worktree.
+4. Use `/heartbeat` se o proprio startup apontar risco ou se houver duvida operacional.
+5. Confira o resumo retornado e o estado do workspace.
+6. Se necessario, abra ou retome uma worktree.
+
+### Triagem de demanda
+
+Quando a demanda ja esta local no workspace:
+
+1. Rode `/backlog`.
+2. Escolha ou atualize a task ativa.
+
+Quando a demanda ainda esta no GitHub:
+
+1. Rode `/gh-project` para descobrir ou filtrar itens.
+2. Rode `/delegate` para transformar a issue ou PR em task rastreavel no workspace.
+3. Rode `/backlog` para confirmar status, prioridade e fila local.
 
 ### Durante o trabalho
 
@@ -360,6 +374,7 @@ Use as ferramentas conforme o tipo de tarefa:
 
 Sempre que estiver mexendo em codigo:
 
+- use `/worktree` quando precisar de isolamento limpo por branch ou por contexto
 - verifique se o branch atual esta limpo antes de comecar
 - crie um branch dedicado antes de qualquer edicao usando prefixo convencional:
   - `git checkout -b feat/<objetivo>`
@@ -396,17 +411,28 @@ Apos um PR ser mergeado:
 ### Encerramento da sessao
 
 1. Rode testes, linters e verifique que o projeto compila.
-2. Rode `/close-session`.
-3. Atualize a memoria diaria e o relatorio de sessao.
-4. Promova para `MEMORY.md` apenas o que for realmente duravel.
-5. Verifique se alguma worktree pode ser limpa.
-6. Ao fechar o CLI, deixe o hook `SessionEnd` registrar o encerramento leve.
+2. Se a sessao foi longa ou gerou decisoes relevantes, rode `/daily-memory` antes de perder contexto.
+3. Rode `/close-session`.
+4. Atualize a memoria diaria e o relatorio de sessao.
+5. Promova para `MEMORY.md` apenas o que for realmente duravel.
+6. Verifique se alguma worktree pode ser limpa.
+7. Ao fechar o CLI, deixe o hook `SessionEnd` registrar o encerramento leve.
 
 ## 9. Slash commands incluidos no pack
 
 Os comandos ficam em:
 
 - `claudeCode-workspace/.claude/commands/`
+
+### Ordem recomendada
+
+| Etapa | Sequencia recomendada |
+|---|---|
+| Abertura | hooks -> `/startup` se necessario -> `/heartbeat` se houver risco |
+| Triagem local | `/backlog` |
+| Triagem GitHub | `/gh-project` -> `/delegate` -> `/backlog` |
+| Execucao isolada | `/worktree` |
+| Registro e fechamento | `/daily-memory` durante a sessao -> `/close-session` no fim |
 
 ### `/heartbeat`
 
@@ -577,13 +603,15 @@ Usa:
 
 Funcao:
 
-- classificar a tarefa e acionar o modelo adequado
+- classificar a tarefa por contexto operacional, impacto e ambiguidade antes de acionar o modelo adequado
 
 Heuristica atual:
 
-- `opus`: arquitetura, refatoracao ampla, debugging com causa desconhecida
-- `sonnet`: geracao de codigo, testes, explicacoes e tarefas com escopo claro
-- `haiku`: operacoes mecanicas, glob, grep, rename, verificacoes simples
+- primeiro identificar se a tarefa vive no workspace, em `repo/`, em integracao externa, em UI/browser ou em operacao mecanica
+- ler o contexto minimo necessario (`CLAUDE.md`, `TOOLS.md`, `Relatorios/Swarm/`, memoria recente e `CLAUDE.md` do repo alvo quando aplicavel)
+- `opus`: arquitetura, refatoracao ampla, debugging com causa desconhecida, decisoes que cruzam workspace, repos e supervisor
+- `sonnet`: geracao de codigo, testes, docs, exploracao guiada por MCP e ajustes no proprio workspace com contexto identificavel
+- `haiku`: operacoes mecanicas, glob, grep, rename, formatacao e verificacoes simples
 
 ### `/test-runner <repo e cenario>`
 
