@@ -365,8 +365,8 @@ Quando a demanda ainda esta no GitHub:
 
 Depois de validar a mudanca e preparar o stage:
 
-1. Use `/commit-commands:commit` para criar o commit local.
-2. Use `/commit-commands:commit-push-pr` quando a entrega ja puder subir e abrir PR.
+1. Use `/commit-commands:commit` para criar o commit local com descricao rica.
+2. Use `/commit-commands:commit-push-pr` quando a entrega ja puder subir e abrir PR com descricao rica.
 3. Continue respeitando a regra de review: abrir PR nao significa mergear.
 
 ### Durante o trabalho
@@ -392,6 +392,7 @@ Sempre que estiver mexendo em codigo:
   - `git checkout -b docs/<objetivo>`
 - nunca commite em `main` ou `master`
 - use formato convencional nas mensagens: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`
+- escreva descricao rica em commit e PR, com contexto, mudancas principais, validacao e risco
 - respeite primeiro o `CLAUDE.md` do repo local
 - valide o que alterou (testes, lint, build)
 - nao reverta trabalho alheio
@@ -440,7 +441,7 @@ Os comandos ficam em:
 | Triagem local | `/backlog` |
 | Triagem GitHub | `/gh-project` -> `/delegate` -> `/backlog` |
 | Execucao isolada | `/worktree` |
-| Finalizacao de entrega | validar -> `/commit-commands:commit` ou `/commit-commands:commit-push-pr` |
+| Finalizacao de entrega | validar -> `/commit-commands:commit` ou `/commit-commands:commit-push-pr` com descricao rica |
 | Limpeza pos-merge | atualizar `main` -> `/commit-commands:clean_gone` |
 | Registro e fechamento | `/daily-memory` durante a sessao -> `/close-session` no fim |
 
@@ -522,13 +523,13 @@ Fluxo esperado:
 
 Objetivo:
 
-- criar um commit git com mensagem gerada automaticamente a partir das mudancas staged
+- criar um commit git com titulo convencional e corpo rico a partir das mudancas staged
 
 ### `/commit-commands:commit-push-pr`
 
 Objetivo:
 
-- criar um commit, fazer push e abrir um pull request em sequencia
+- criar um commit, fazer push e abrir um pull request em sequencia com descricao rica no PR
 
 ### `/commit-commands:clean_gone`
 

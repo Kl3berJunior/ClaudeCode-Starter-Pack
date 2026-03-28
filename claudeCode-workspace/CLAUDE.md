@@ -65,6 +65,7 @@ Regras:
 - nao abrir worktree antes de a task ou objetivo estar claro e rastreavel
 - usar `/heartbeat` como auditoria de saude, nao como substituto de `/startup`
 - usar `commit-commands` apenas depois de validar a mudanca e preparar o stage
+- commit e PR devem ter descricao rica, nao so titulo curto
 - `commit-push-pr` nao substitui review nem autorizacao de merge
 - usar `/close-session` sempre como fechamento rico, mesmo quando `/daily-memory` ja tiver sido executado
 
@@ -224,6 +225,10 @@ Fluxo obrigatorio ao fazer alteracoes em codigo:
    - `refactor: ...`
    - `chore: ...`
    - `docs: ...`
+   Alem do titulo, preferir corpo rico com:
+   - contexto ou problema
+   - principais mudancas
+   - validacao executada ou motivo da ausencia
 5. Antes de concluir: rodar testes, linters e garantir que o projeto compila.
 
 Regras adicionais:
@@ -236,6 +241,7 @@ Regras adicionais:
 Nenhum PR pode ser mergeado sem review explicita. Fluxo obrigatorio:
 
 1. Abrir o PR com `gh pr create`
+   - usar descricao rica com contexto, mudancas principais, validacao, risco e links relevantes
 2. Aguardar o usuario revisar e aprovar — ou solicitar explicitamente ao agente que faca a review
 3. Somente apos aprovacao explicita do usuario executar `gh pr merge`
 

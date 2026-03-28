@@ -112,7 +112,7 @@ Checklist curto de saude operacional, incluindo auditoria leve de worktrees.
 | Triagem local | `/backlog` |
 | Triagem GitHub | `/gh-project` -> `/delegate` -> `/backlog` |
 | Execucao isolada | `/worktree` |
-| Finalizacao de entrega | validar -> `/commit-commands:commit` ou `/commit-commands:commit-push-pr` |
+| Finalizacao de entrega | validar -> `/commit-commands:commit` ou `/commit-commands:commit-push-pr` com descricao rica |
 | Limpeza pos-merge | atualizar `main` -> `/commit-commands:clean_gone` |
 | Registro e fechamento | `/daily-memory` durante a sessao -> `/close-session` no fim |
 

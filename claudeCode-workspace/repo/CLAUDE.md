@@ -15,6 +15,7 @@ Este arquivo governa como o Claude Code deve atuar neste repositorio.
 
 - nao reverter trabalho alheio
 - nao commitar sem instrucao clara
+- commit e PR devem ter descricao rica, com contexto, mudancas principais, validacao e risco
 - validar o que foi alterado
 - registrar risco relevante no artefato final
 

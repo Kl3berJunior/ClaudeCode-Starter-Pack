@@ -23,6 +23,7 @@ Nao colocar aqui segredos, tokens ou senhas.
 - PRs obrigatorias antes de mergear em `main`
 - review explicita do usuario obrigatoria antes do merge - o agente nao mergea sem instrucao direta
 - mensagens de commit no formato convencional: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`
+- commit e PR devem ter descricao rica, com contexto, mudancas principais, validacao e risco
 - apos merge: deletar branch local e remoto, rodar `git remote prune origin`
 - GitHub configurado com `delete_branch_on_merge=true` - branch remoto apagado automaticamente
 
