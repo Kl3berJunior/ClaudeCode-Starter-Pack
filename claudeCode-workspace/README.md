@@ -128,6 +128,7 @@ Observacao:
 - Commits: conventional commits (`feat: ...`, `fix: ...`)
 - Commit e PR: devem ter descricao rica com contexto, mudancas, validacao e risco
 - PRs: sempre abrir PR e aguardar review explicita antes de merge
+- Fora do diretorio atual, usar `git -C <path> ...` em vez de `cd <path> && git ...`
 
 ## Memoria
 

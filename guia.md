@@ -262,6 +262,7 @@ No estado atual deste pack, ele:
 
 - libera leitura, escrita, edicao, glob e grep
 - habilita `git` via `Bash(git:*)`
+- pede que comandos git fora do diretorio atual usem `git -C <path> ...`, evitando `cd <path> && git ...`
 - registra hooks nativos de sessao:
   - `SessionStart`
   - `UserPromptSubmit`
@@ -428,6 +429,8 @@ Sempre que estiver mexendo em codigo:
 - valide o que alterou (testes, lint, build)
 - nao reverta trabalho alheio
 - nao faca push ou publicacao sem instrucao clara
+- quando precisar operar outro repo ou worktree sem trocar o diretorio atual, prefira `git -C <path> ...`
+- evite `cd <path> && git ...` para manter compatibilidade com a permissao `Bash(git:*)`
 
 ### Pos-merge obrigatorio
 
@@ -716,6 +719,8 @@ O branch associado deve seguir prefixo convencional: `feat/`, `fix/`, `chore/`, 
 - registrar objetivo claro, branch e dono ou task
 - pedir confirmacao antes de remover
 - preferir `git worktree prune` para metadata orfa
+- quando o git apontar para outro diretorio, usar `git -C <path> ...`
+- evitar `cd <path> && git ...` para respeitar `Bash(git:*)`
 
 ### Comandos uteis
 
@@ -818,6 +823,8 @@ Se cada worktree seguir um padrao diferente, a auditoria fica ruim. O pack usa d
 ```
 
 Repos internos em `repo/` sao git repos separados e precisam de `git -C repo/<nome> worktree add` — nao use `git worktree add` diretamente para eles.
+
+Quando precisar rodar git em outro diretorio, prefira `git -C <path> ...` em vez de `cd <path> && git ...`, porque a permissao ativa libera `git` via `Bash(git:*)`.
 
 ## 15. Checklist rapido de implantacao
 

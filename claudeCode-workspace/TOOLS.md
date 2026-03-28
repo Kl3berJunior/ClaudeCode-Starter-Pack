@@ -343,6 +343,8 @@ Regras:
 - nunca remover o worktree principal
 - sempre rodar `git worktree prune` apos remover
 - worktrees de repos internos precisam de `git -C repo/<nome> worktree prune` separado
+- ao operar git fora do diretorio atual, preferir `git -C <path> ...`
+- evitar `cd <path> && git ...` para respeitar a permissao `Bash(git:*)`
 
 ---
 
