@@ -179,8 +179,11 @@ function Merge-Tools() {
 
     if ($sourceMatch.Success -and $targetMatch.Success) {
         $mergedContent = Replace-Match $sourceContent $sourceMatch $targetMatch.Value
-    } else {
+    } elseif (-not $sourceMatch.Success) {
         $mergedContent = $sourceContent
+    } else {
+        # target nao tem a estrutura esperada (ex: ## Worktrees ausente) — preservar target
+        $mergedContent = $targetContent
     }
 
     Write-Utf8 $targetPath $mergedContent
@@ -232,7 +235,12 @@ function Merge-BulletSection(
     }
 
     $newBody += ($missingBullets -join "`r`n")
-    $replacement = '## ' + $targetMatch.Groups['heading'].Value + "`r`n`r`n" + $newBody + "`r`n"
+    $headingText = if ($targetMatch.Groups['heading'].Success -and $targetMatch.Groups['heading'].Value) {
+        $targetMatch.Groups['heading'].Value
+    } else {
+        $SourceHeading
+    }
+    $replacement = '## ' + $headingText + "`r`n`r`n" + $newBody + "`r`n"
     return Replace-Match $TargetContent $targetMatch $replacement
 }
 
