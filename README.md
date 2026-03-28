@@ -211,6 +211,7 @@ Convencao:
 
 Regras:
 
+- fora do diretorio atual, preferir `git -C <path> ...` em vez de `cd <path> && git ...` para respeitar `Bash(git:*)`
 - auditar antes de criar nova worktree
 - verificar reaproveitamento antes de abrir outra
 - nunca remover com mudancas nao commitadas sem confirmar

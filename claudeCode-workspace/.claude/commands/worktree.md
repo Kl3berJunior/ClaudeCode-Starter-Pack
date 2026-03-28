@@ -77,3 +77,5 @@ Passos:
 - Manter `.wt/workspace/` para worktrees do workspace e `.wt/<repo-name>/` para repos internos
 - Apos remover, sempre rodar `worktree prune` no git repo correspondente
 - Worktrees de repos internos usam o git do repo, nao o git do workspace
+- Quando o git precisar apontar para outro diretorio, usar `git -C <path> ...`
+- Evitar `cd <path> && git ...` para manter compatibilidade com `Bash(git:*)`

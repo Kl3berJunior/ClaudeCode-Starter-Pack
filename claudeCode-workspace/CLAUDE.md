@@ -157,6 +157,8 @@ Worktrees sao o mecanismo padrao para paralelo limpo, auditoria rastreavel e iso
 Regras:
 
 - worktrees operacionais devem viver em `.wt/`
+- quando o comando git apontar para outro diretorio, usar `git -C <path> ...` em vez de `cd <path> && git ...`
+- evitar `cd <path> && git ...` porque a permissao do workspace libera `git` via `Bash(git:*)`
 - padrao de caminho por tipo:
   - workspace: `.wt/workspace/<objetivo-ou-branch>` — para isolar trabalho no proprio workspace
   - repo interno: `.wt/<repo-em-kebab-case>/<objetivo-ou-branch>` — para repos em `repo/` (git repos separados)
@@ -235,6 +237,8 @@ Regras adicionais:
 
 - nao reverter trabalho alheio
 - nao usar `--no-verify` ou `--force-push` sem instrucao explicita
+- quando precisar operar outro repo ou worktree sem trocar o diretorio atual, preferir `git -C <path> ...`
+- evitar `cd <path> && git ...` para manter compatibilidade com a permissao `Bash(git:*)`
 
 ## Review obrigatorio antes do merge
 
