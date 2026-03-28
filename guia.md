@@ -361,6 +361,14 @@ Quando a demanda ainda esta no GitHub:
 2. Rode `/delegate` para transformar a issue ou PR em task rastreavel no workspace.
 3. Rode `/backlog` para confirmar status, prioridade e fila local.
 
+### Finalizacao de entrega
+
+Depois de validar a mudanca e preparar o stage:
+
+1. Use `/commit-commands:commit` para criar o commit local.
+2. Use `/commit-commands:commit-push-pr` quando a entrega ja puder subir e abrir PR.
+3. Continue respeitando a regra de review: abrir PR nao significa mergear.
+
 ### Durante o trabalho
 
 Use as ferramentas conforme o tipo de tarefa:
@@ -432,6 +440,8 @@ Os comandos ficam em:
 | Triagem local | `/backlog` |
 | Triagem GitHub | `/gh-project` -> `/delegate` -> `/backlog` |
 | Execucao isolada | `/worktree` |
+| Finalizacao de entrega | validar -> `/commit-commands:commit` ou `/commit-commands:commit-push-pr` |
+| Limpeza pos-merge | atualizar `main` -> `/commit-commands:clean_gone` |
 | Registro e fechamento | `/daily-memory` durante a sessao -> `/close-session` no fim |
 
 ### `/heartbeat`
