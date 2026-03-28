@@ -53,9 +53,10 @@ function Replace-Match([string]$Content, [System.Text.RegularExpressions.Match]$
 }
 
 function Convert-WorkspaceText([string]$Content) {
-    return $Content.
-        Replace('__WORKSPACE_ROOT__', $resolvedTargetRootUnix).
-        Replace($sourceWorkspaceRootUnix, $resolvedTargetRootUnix)
+    # single-pass para evitar substituicao em cascata caso os paths se sobreponham
+    $pattern = [System.Text.RegularExpressions.Regex]::Escape('__WORKSPACE_ROOT__') + '|' +
+               [System.Text.RegularExpressions.Regex]::Escape($sourceWorkspaceRootUnix)
+    return [System.Text.RegularExpressions.Regex]::Replace($Content, $pattern, { $resolvedTargetRootUnix })
 }
 
 function Copy-FileFromSource([string]$RelativePath) {
@@ -93,7 +94,7 @@ function Get-RelativeFiles([string]$RelativeDirectory, [string]$Filter) {
         }
 }
 
-function Get-JsonArray([object]$JsonObject, [string]$PropertyName) {
+function Get-PermissionsArray([object]$JsonObject, [string]$PropertyName) {
     if ($null -eq $JsonObject) {
         return @()
     }
@@ -143,8 +144,8 @@ function Merge-SettingsLocal() {
     $sourceJson = if (Test-Path -LiteralPath $sourcePath) { (Read-Utf8 $sourcePath | ConvertFrom-Json) } else { $null }
     $targetJson = if (Test-Path -LiteralPath $targetPath) { (Read-Utf8 $targetPath | ConvertFrom-Json) } else { $null }
 
-    $allow = Merge-UniqueStrings (Get-JsonArray $targetJson 'allow') (Get-JsonArray $sourceJson 'allow')
-    $deny = Merge-UniqueStrings (Get-JsonArray $targetJson 'deny') (Get-JsonArray $sourceJson 'deny')
+    $allow = Merge-UniqueStrings (Get-PermissionsArray $targetJson 'allow') (Get-PermissionsArray $sourceJson 'allow')
+    $deny = Merge-UniqueStrings (Get-PermissionsArray $targetJson 'deny') (Get-PermissionsArray $sourceJson 'deny')
 
     $payload = [ordered]@{
         permissions = [ordered]@{
@@ -179,8 +180,11 @@ function Merge-Tools() {
 
     if ($sourceMatch.Success -and $targetMatch.Success) {
         $mergedContent = Replace-Match $sourceContent $sourceMatch $targetMatch.Value
-    } else {
+    } elseif (-not $sourceMatch.Success) {
         $mergedContent = $sourceContent
+    } else {
+        # target nao tem a estrutura esperada (ex: ## Worktrees ausente) — preservar target
+        $mergedContent = $targetContent
     }
 
     Write-Utf8 $targetPath $mergedContent
@@ -217,7 +221,9 @@ function Merge-BulletSection(
 
     $targetBody = $targetMatch.Groups['body'].Value.TrimEnd("`r", "`n")
     $missingBullets = @(
-        $sourceBullets | Where-Object { $targetBody -notlike "*$_*" }
+        $sourceBullets | Where-Object {
+            -not $targetBody.Contains($_, [System.StringComparison]::OrdinalIgnoreCase)
+        }
     )
 
     if ($missingBullets.Count -eq 0) {
@@ -230,7 +236,12 @@ function Merge-BulletSection(
     }
 
     $newBody += ($missingBullets -join "`r`n")
-    $replacement = '## ' + $targetMatch.Groups['heading'].Value + "`r`n`r`n" + $newBody + "`r`n"
+    $headingText = if ($targetMatch.Groups['heading'].Success -and $targetMatch.Groups['heading'].Value) {
+        $targetMatch.Groups['heading'].Value
+    } else {
+        $SourceHeading
+    }
+    $replacement = '## ' + $headingText + "`r`n`r`n" + $newBody + "`r`n"
     return Replace-Match $TargetContent $targetMatch $replacement
 }
 
@@ -299,7 +310,9 @@ function Merge-Memory() {
     )
 
     $missingBullets = @(
-        $sourceBullets | Where-Object { $targetContent -notlike "*$_*" }
+        $sourceBullets | Where-Object {
+            -not $targetContent.Contains($_, [System.StringComparison]::OrdinalIgnoreCase)
+        }
     )
 
     $mergedContent = $targetContent
