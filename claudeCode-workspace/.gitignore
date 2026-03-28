@@ -2,8 +2,14 @@
 .claude/settings.local.json
 
 # Estado local nao rastreavel
-# Relatorios/ e versionado — task-backlog.md, supervisor-status.md e agent-sessions/ sao canonicos
+# memory/ e completamente local
 memory/
+
+# Relatorios/agent-sessions/ — apenas o README e versionado; relatorios reais sao locais
+Relatorios/agent-sessions/????-??-??-*.md
+
+# Area local de testes e configuracao (nao compartilhada com o template)
+_local/
 
 # Worktrees temporarias
 .wt/
