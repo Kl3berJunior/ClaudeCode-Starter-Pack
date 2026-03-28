@@ -15,6 +15,8 @@ O pack tem duas partes:
 
 ```text
 ClaudeCode-Starter-Pack/
+|-- scripts/
+|   `-- sync-starter-pack-to-workspace.ps1   # Atualiza um workspace real a partir do starter pack local
 `-- claudeCode-workspace/
     |-- .claude/
     |   |-- settings.json            # Permissoes locais e MCPs/plugins habilitados
@@ -256,6 +258,30 @@ Sessao inicia
 4. Ajuste `__WORKSPACE_ROOT__` nos arquivos com placeholder, incluindo o `--project-path` do Serena em `.claude/settings.json`.
 5. Revise `.claude/settings.json`.
 6. Abra o Claude Code no workspace.
+
+## Atualizar um workspace existente
+
+Para reaplicar melhorias do starter pack em um workspace real ja existente, use:
+
+```powershell
+.\scripts\sync-starter-pack-to-workspace.ps1
+```
+
+Exemplos uteis:
+
+```powershell
+.\scripts\sync-starter-pack-to-workspace.ps1 -TargetWorkspaceRoot 'C:\Work\MeuWorkspace'
+.\scripts\sync-starter-pack-to-workspace.ps1 -ResetRuntimeState
+.\scripts\sync-starter-pack-to-workspace.ps1 -WhatIf
+```
+
+O script:
+
+- sincroniza arquivos estruturais do starter pack
+- preserva a secao de repositorios de `TOOLS.md`
+- faz merge conservador de `USER.md`, `MEMORY.md` e `.claude/settings.local.json`
+- nao toca no conteudo de `repo/` nem em `tests/`
+- so reseta `memory/`, `agent-sessions/` e `supervisor-status.md` quando `-ResetRuntimeState` for usado
 
 ---
 

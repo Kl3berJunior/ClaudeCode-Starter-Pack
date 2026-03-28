@@ -26,6 +26,8 @@ Na pratica, ele resolve estes problemas:
 ClaudeCode-Starter-Pack/
 |-- README.md
 |-- guia.md
+|-- scripts/
+|   `-- sync-starter-pack-to-workspace.ps1
 `-- claudeCode-workspace/
     |-- .claude/
     |   |-- hooks/
@@ -122,6 +124,30 @@ robocopy .\claudeCode-workspace C:\Work\MeuWorkspace /E
 ```
 
 Observe que o importante e preservar tambem as pastas ocultas, como `.claude/` e `.serena/`.
+
+### Passo 2.1. Atualize um workspace existente
+
+Se o workspace real ja existe e voce quer apenas reaplicar as melhorias do starter pack local, use o script versionado deste repositorio:
+
+```powershell
+.\scripts\sync-starter-pack-to-workspace.ps1
+```
+
+Exemplos:
+
+```powershell
+.\scripts\sync-starter-pack-to-workspace.ps1 -TargetWorkspaceRoot 'C:\Work\MeuWorkspace'
+.\scripts\sync-starter-pack-to-workspace.ps1 -ResetRuntimeState
+.\scripts\sync-starter-pack-to-workspace.ps1 -WhatIf
+```
+
+Comportamento esperado:
+
+- atualiza arquivos estruturais do workspace a partir de `claudeCode-workspace/`
+- preserva a secao de repositorios em `TOOLS.md`
+- faz merge conservador de `USER.md`, `MEMORY.md` e `.claude/settings.local.json`
+- nao sobrescreve o conteudo dos repos internos em `repo/`
+- so limpa memoria e sessoes quando `-ResetRuntimeState` for informado
 
 ### Passo 3. Coloque seus repositorios de codigo dentro da pasta `repo`
 
