@@ -180,9 +180,46 @@ PR:
 
 - resumo do contexto e do objetivo
 - principais mudancas por area
-- validacao executada
+- validacao executada ou motivo da ausencia
 - riscos, impacto e pendencias
 - links para task, issue ou artefato quando houver
+
+### Exemplos
+
+**Commit:**
+
+```
+fix: corrigir calculo de prazo em despesas recorrentes
+
+O prazo estava sendo calculado com base na data de criacao do registro
+em vez da data de vencimento configurada pelo usuario.
+
+Mudancas:
+- corrigido calculo em `DespesaService.calcularPrazo`
+- adicionado teste cobrindo o caso de vencimento retroativo
+
+Validacao: teste unitario e teste de integracao passando localmente.
+```
+
+**PR:**
+
+```
+## Contexto
+Despesas recorrentes mostravam prazo incorreto quando o vencimento
+era anterior a data de criacao do registro.
+
+## Mudancas
+- DespesaService: corrigido calculo de prazo
+- tests/despesa: adicionado cenario de vencimento retroativo
+
+## Validacao
+Testes unitarios e de integracao passando. Reproduzido manualmente
+antes e apos a correcao.
+
+## Risco
+Baixo. Mudanca isolada em metodo de calculo sem efeito colateral
+em outros fluxos.
+```
 
 ## Hooks de sessao
 

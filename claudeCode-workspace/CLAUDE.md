@@ -228,7 +228,7 @@ Fluxo obrigatorio ao fazer alteracoes em codigo:
    Alem do titulo, preferir corpo rico com:
    - contexto ou problema
    - principais mudancas
-   - validacao executada
+   - validacao executada ou motivo da ausencia
 5. Antes de concluir: rodar testes, linters e garantir que o projeto compila.
 
 Regras adicionais:
