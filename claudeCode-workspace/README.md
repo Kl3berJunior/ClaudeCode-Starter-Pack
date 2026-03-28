@@ -50,6 +50,9 @@ claudeCode-workspace/
 | `/worktree <acao>` | Cria, lista ou remove worktrees em `.wt/` |
 | `/gh-project <acao>` | Consulta projetos do GitHub via `gh project` |
 | `/delegate <numero> <org/repo>` | Le issue ou PR do GitHub e cria ou atualiza task no backlog |
+| `/commit-commands:commit` | Cria commit local a partir das mudancas staged |
+| `/commit-commands:commit-push-pr` | Cria commit, faz push e abre PR |
+| `/commit-commands:clean_gone` | Limpa branches locais `[gone]` e worktrees associadas |
 
 ## Fluxo de commands
 
@@ -58,6 +61,8 @@ claudeCode-workspace/
 | Abrir sessao | hooks -> `/startup` se necessario -> `/heartbeat` se houver risco ou duvida |
 | Trazer demanda do GitHub | `/gh-project` -> `/delegate` -> `/backlog` |
 | Executar task local | `/backlog` -> `/worktree` se precisar de isolamento -> execucao |
+| Finalizar entrega | validar mudanca -> `/commit-commands:commit` ou `/commit-commands:commit-push-pr` |
+| Limpeza pos-merge | atualizar `main` -> `/commit-commands:clean_gone` |
 | Registrar sessao longa | `/daily-memory` |
 | Encerrar | `/close-session` |
 
@@ -98,7 +103,8 @@ claudeCode-workspace/
 3. Usar serena para navegar     - evitar leitura cega
 4. Usar context7 para libs      - nao assumir contratos
 5. Validar com testes e lint    - antes de commitar
-6. gh pr create                 - abrir PR para review
+6. /commit-commands:commit      - criar commit local com mudancas staged
+7. /commit-commands:commit-push-pr - quando a entrega ja puder virar PR
 ```
 
 ### Encerramento de sessao

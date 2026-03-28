@@ -55,6 +55,8 @@ Commands do workspace devem seguir a sequencia operacional abaixo:
 - triagem de demanda local: `/backlog`
 - triagem de demanda vinda do GitHub: `/gh-project` -> `/delegate` -> `/backlog`
 - isolamento de execucao: `/worktree`
+- finalizacao de entrega: `/commit-commands:commit` ou `/commit-commands:commit-push-pr`
+- limpeza pos-merge: `/commit-commands:clean_gone` quando houver branches `[gone]`
 - registro e fechamento: `/daily-memory` durante a sessao, `/close-session` como ultimo comando
 
 Regras:
@@ -62,6 +64,8 @@ Regras:
 - nao usar `/delegate` como substituto de `/backlog`; ele serve para alimentar ou atualizar o backlog
 - nao abrir worktree antes de a task ou objetivo estar claro e rastreavel
 - usar `/heartbeat` como auditoria de saude, nao como substituto de `/startup`
+- usar `commit-commands` apenas depois de validar a mudanca e preparar o stage
+- `commit-push-pr` nao substitui review nem autorizacao de merge
 - usar `/close-session` sempre como fechamento rico, mesmo quando `/daily-memory` ja tiver sido executado
 
 ## Objetivo
