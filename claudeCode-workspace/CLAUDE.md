@@ -47,6 +47,23 @@ Se o usuario enviar uma mensagem avulsa logo ao abrir o Claude CLI, o fluxo espe
 2. o hook injetar o contexto minimo da sessao
 3. se houver falha ou estado invalido, bloquear o prompt e exigir `/startup`
 
+## Uso de commands por fluxo
+
+Commands do workspace devem seguir a sequencia operacional abaixo:
+
+- abertura e reparo de contexto: `SessionStart` -> `/startup` -> `/heartbeat` quando necessario
+- triagem de demanda local: `/backlog`
+- triagem de demanda vinda do GitHub: `/gh-project` -> `/delegate` -> `/backlog`
+- isolamento de execucao: `/worktree`
+- registro e fechamento: `/daily-memory` durante a sessao, `/close-session` como ultimo comando
+
+Regras:
+
+- nao usar `/delegate` como substituto de `/backlog`; ele serve para alimentar ou atualizar o backlog
+- nao abrir worktree antes de a task ou objetivo estar claro e rastreavel
+- usar `/heartbeat` como auditoria de saude, nao como substituto de `/startup`
+- usar `/close-session` sempre como fechamento rico, mesmo quando `/daily-memory` ja tiver sido executado
+
 ## Objetivo
 
 Aqui vivem:
@@ -152,26 +169,36 @@ Auto-gestao:
 
 ## Roteamento de modelo (agentes e subagentes)
 
-Ao spawnar subagentes via ferramenta Agent, escolher o modelo pelo tipo de tarefa:
+Ao spawnar subagentes via ferramenta Agent, escolher o modelo por contexto operacional, impacto e ambiguidade - nao so por "tamanho" da tarefa.
+
+Leituras minimas antes da escolha:
+
+- identificar se a tarefa vive no workspace, em `repo/`, em integracao externa, em UI/browser ou em operacao mecanica
+- ler `CLAUDE.md` e `TOOLS.md` quando a tarefa tocar fluxo operacional ou repo conhecido
+- ler `Relatorios/Swarm/` e memoria recente quando a tarefa depender de continuidade, backlog, supervisor ou worktrees
+- ler `CLAUDE.md` do repo alvo antes de mexer em codigo
 
 | Modelo | Quando usar |
 |---|---|
-| `opus` | Arquitetura, refatoracao cross-repo, debugging com causa desconhecida, decisoes de alto impacto |
-| `sonnet` | Geracao de codigo, testes, explicacoes, buscas, tarefas com spec clara |
-| `haiku` | Operacoes mecanicas: glob, grep, rename, verificacoes simples |
+| `opus` | Arquitetura, refatoracao cross-repo, debugging com causa desconhecida, decisoes que cruzam workspace/repos/supervisor, tarefas de alto impacto |
+| `sonnet` | Mudancas com contexto identificavel e escopo claro: codigo, testes, docs, agentes, hooks, relatorios, exploracao guiada por MCP |
+| `haiku` | Operacoes mecanicas e deterministicas: glob, grep, rename, formatacao, verificacoes simples |
 
 Regras:
 
 - declarar o modelo escolhido e o motivo antes de spawnar o subagente
+- citar o contexto dominante usado na decisao
 - tarefas independentes podem rodar em subagentes paralelos com modelos diferentes
 - nao usar Opus para tarefas simples: custo e latencia nao justificam
-- nao usar Haiku para tarefas que exigem raciocinio encadeado
+- nao usar Haiku para tarefas que exigem raciocinio encadeado, sintese ou leitura espalhada de contexto
+- se a tarefa revelar ambiguidade maior do que parecia no inicio, subir o modelo em vez de insistir no roteamento inicial
+- em tarefa longa, multi-etapa ou com historico extenso, considerar `context-mode` como parte do plano
 
 Agentes disponiveis em `.claude/agents/`:
 
 - `/review-deep <arquivo>` — analise profunda via Opus
 - `/explain <simbolo-ou-arquivo>` — explicacao concisa via Sonnet
-- `/agent-router <tarefa>` — roteamento automatico por complexidade (o proprio router roda em Sonnet e delega para Opus, Sonnet ou Haiku conforme a tarefa)
+- `/agent-router <tarefa>` â€” roteamento automatico contextual (o proprio router roda em Sonnet e delega para Opus, Sonnet ou Haiku conforme o contexto dominante da tarefa)
 
 ## Git
 

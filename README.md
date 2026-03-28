@@ -22,7 +22,7 @@ ClaudeCode-Stater-Pack/
     |   |-- agents/
     |   |   |-- review-deep.md       # Agente Opus: analise arquitetural profunda
     |   |   |-- explain.md           # Agente Sonnet: explicacao concisa de simbolos e arquivos
-    |   |   |-- agent-router.md      # Agente Sonnet: classifica e delega para Opus/Sonnet/Haiku
+    |   |   |-- agent-router.md      # Agente Sonnet: classifica e delega por contexto operacional
     |   |   `-- test-runner.md       # Agente Sonnet: criacao e execucao de testes (PowerShell + Playwright)
     |   `-- commands/
     |       |-- backlog.md           # Slash command para listar e atualizar backlog operacional
@@ -104,6 +104,16 @@ Checklist curto de saude operacional, incluindo auditoria leve de worktrees.
 
 ## Slash Commands
 
+### Fluxo recomendado
+
+| Etapa | Sequencia recomendada |
+|---|---|
+| Abertura | hooks -> `/startup` se necessario -> `/heartbeat` se houver risco |
+| Triagem local | `/backlog` |
+| Triagem GitHub | `/gh-project` -> `/delegate` -> `/backlog` |
+| Execucao isolada | `/worktree` |
+| Registro e fechamento | `/daily-memory` durante a sessao -> `/close-session` no fim |
+
 ### `/heartbeat`
 
 Verifica estado operacional, bloqueios e sinais de worktrees com risco ou limpeza pendente.
@@ -132,7 +142,7 @@ Explicacao concisa do comportamento via **Sonnet**. Foco no que entra, o que sai
 
 ### `/agent-router <tarefa>`
 
-Roteador de complexidade via **Sonnet**. O proprio router roda em Sonnet e classifica a tarefa para delegar ao modelo adequado (Opus / Sonnet / Haiku). Suporta execucao paralela de partes independentes.
+Roteador contextual via **Sonnet**. O proprio router roda em Sonnet, le o contexto minimo necessario do workspace e classifica a tarefa para delegar ao modelo adequado (Opus / Sonnet / Haiku). Suporta execucao paralela de partes independentes.
 
 ### `/test-runner <repo e cenario>`
 
@@ -142,9 +152,9 @@ Criacao e execucao de testes via **Sonnet**. Cobre testes de API em PowerShell (
 
 | Modelo | Quando usar |
 |---|---|
-| Opus | Arquitetura, refatoracao cross-repo, debugging sem causa conhecida |
-| Sonnet | Geracao de codigo, testes, explicacoes, buscas |
-| Haiku | Glob, grep, rename, verificacoes mecanicas |
+| Opus | Arquitetura, refatoracao cross-repo, debugging sem causa conhecida, decisoes que cruzam workspace, repos e supervisor |
+| Sonnet | Codigo, testes, docs, exploracao com contexto identificavel, ajustes no proprio workspace |
+| Haiku | Glob, grep, rename, formatacao e verificacoes realmente mecanicas |
 
 ---
 

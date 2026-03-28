@@ -51,13 +51,23 @@ claudeCode-workspace/
 | `/gh-project <acao>` | Consulta projetos do GitHub via `gh project` |
 | `/delegate <numero> <org/repo>` | Le issue ou PR do GitHub e cria ou atualiza task no backlog |
 
+## Fluxo de commands
+
+| Etapa | Sequencia recomendada |
+|-------|-----------------------|
+| Abrir sessao | hooks -> `/startup` se necessario -> `/heartbeat` se houver risco ou duvida |
+| Trazer demanda do GitHub | `/gh-project` -> `/delegate` -> `/backlog` |
+| Executar task local | `/backlog` -> `/worktree` se precisar de isolamento -> execucao |
+| Registrar sessao longa | `/daily-memory` |
+| Encerrar | `/close-session` |
+
 ## Agentes disponiveis
 
 | Agente | Modelo | Uso |
 |--------|--------|-----|
 | `/review-deep <arquivo>` | Opus | Analise arquitetural profunda |
 | `/explain <simbolo>` | Sonnet | Explicacao concisa de codigo |
-| `/agent-router <tarefa>` | Sonnet | Roteamento automatico por complexidade |
+| `/agent-router <tarefa>` | Sonnet | Roteamento automatico por contexto operacional |
 
 ## Fluxo de trabalho
 
@@ -67,26 +77,38 @@ claudeCode-workspace/
 1. SessionStart hook           - auto-inicializar a sessao e criar o marcador local
 2. /startup (se necessario)    - auditar ou reparar o contexto da sessao
 3. Ler o resumo retornado      - entender contexto herdado e riscos
-4. Ler CLAUDE.md do repo alvo  - entender contrato local
+4. /heartbeat (se houver risco) - verificar saude operacional
+5. Ler CLAUDE.md do repo alvo  - entender contrato local
+```
+
+### Triagem de demanda
+
+```
+1. /backlog                    - ver ou atualizar fila local
+2. /gh-project                 - descobrir demanda ainda nao internalizada
+3. /delegate                   - transformar issue/PR em task rastreavel
+4. /backlog                    - confirmar status e prioridade finais
 ```
 
 ### Trabalho em codigo
 
 ```
-1. git checkout -b feat/<nome>  - criar branch dedicada (OBRIGATORIO)
-2. Usar serena para navegar     - evitar leitura cega
-3. Usar context7 para libs      - nao assumir contratos
-4. Validar com testes e lint    - antes de commitar
-5. gh pr create                 - abrir PR para review
+1. /worktree (se necessario)    - isolar execucao e branch
+2. git checkout -b feat/<nome>  - criar branch dedicada (OBRIGATORIO)
+3. Usar serena para navegar     - evitar leitura cega
+4. Usar context7 para libs      - nao assumir contratos
+5. Validar com testes e lint    - antes de commitar
+6. gh pr create                 - abrir PR para review
 ```
 
 ### Encerramento de sessao
 
 ```
-1. /close-session              - atualizar memoria, relatorio e marcador de sessao
-2. Avaliar MEMORY.md           - promover conhecimento duravel
-3. SessionEnd hook             - registrar saida leve ao fechar o CLI
-4. Revisar worktrees           - propor limpeza apenas se elegivel
+1. /daily-memory (se a sessao foi longa) - registrar fatos antes de perder contexto
+2. /close-session                        - atualizar memoria, relatorio e marcador de sessao
+3. Avaliar MEMORY.md                     - promover conhecimento duravel
+4. SessionEnd hook                       - registrar saida leve ao fechar o CLI
+5. Revisar worktrees                     - propor limpeza apenas se elegivel
 ```
 
 ## Git
