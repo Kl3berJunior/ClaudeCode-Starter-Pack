@@ -6,7 +6,8 @@ Este guia explica como pegar este starter pack, transformar isso em um workspace
 
 O pack organiza o uso do Claude Code em dois niveis:
 
-- `claudeCode-workspace/`: o workspace principal, com memoria, comandos customizados, configuracao local e contrato operacional.
+- `claudeCode-workspace/`: o workspace principal, com bootstrap curto,
+  memoria, regras modulares, comandos customizados e configuracao local.
 - `claudeCode-workspace/repo/CLAUDE.md`: o template de `CLAUDE.md` para copiar para dentro de cada repositorio de codigo.
 
 Na pratica, ele resolve estes problemas:
@@ -27,11 +28,15 @@ ClaudeCode-Starter-Pack/
 |-- README.md
 |-- guia.md
 |-- scripts/
-|   `-- sync-starter-pack-to-workspace.ps1
+|   |-- sync-starter-pack-to-workspace.ps1
+|   `-- new-disposable-workspace.ps1
 `-- claudeCode-workspace/
     |-- .claude/
+    |   |-- agents/
+    |   |-- commands/
     |   |-- hooks/
-    |   `-- commands/
+    |   |-- rules/
+    |   `-- settings.json
     |-- .serena/
     |-- memory/
     |   `-- _session-state.json
@@ -50,7 +55,8 @@ ClaudeCode-Starter-Pack/
 
 | Arquivo | Papel |
 |---|---|
-| `claudeCode-workspace/CLAUDE.md` | Contrato principal do workspace. E o primeiro arquivo que governa a sessao. |
+| `claudeCode-workspace/CLAUDE.md` | Bootstrap curto do workspace. Mantem apenas o minimo sempre carregado. |
+| `claudeCode-workspace/.claude/rules/` | Regras modulares do workspace, globais ou condicionais por path. |
 | `claudeCode-workspace/SOUL.md` | Principios permanentes do fluxo. |
 | `claudeCode-workspace/USER.md` | Contexto operacional do time ou da pessoa usuaria. |
 | `claudeCode-workspace/TOOLS.md` | Caminhos, comandos e heuristicas de ferramentas. |
@@ -83,6 +89,9 @@ Importante:
 - `Relatorios/` e versionado — `task-backlog.md`, `supervisor-status.md` e `agent-sessions/` sao arquivos canonicos
 
 - o starter pack deve comecar sem memorias diarias e sem relatorios de sessao datados; esses arquivos sao gerados no uso real
+- `CLAUDE.local.md` pode ser usado para preferencias privadas sem alterar o template compartilhado
+- `.tmp/` e a area descartavel do repositorio para smoke tests, sandboxes e validacoes do starter pack
+- para testar melhorias do template, prefira `.\scripts\new-disposable-workspace.ps1` em vez de gerar runtime no workspace base
 
 ## 4. Como instalar o pack em um workspace real
 
@@ -138,16 +147,33 @@ Exemplos:
 ```powershell
 .\scripts\sync-starter-pack-to-workspace.ps1 -TargetWorkspaceRoot 'C:\Work\MeuWorkspace'
 .\scripts\sync-starter-pack-to-workspace.ps1 -ResetRuntimeState
+.\scripts\sync-starter-pack-to-workspace.ps1 -TargetWorkspaceRoot 'C:\Work\MeuWorkspace' -MergeSourceSettingsLocal
 .\scripts\sync-starter-pack-to-workspace.ps1 -WhatIf
 ```
 
 Comportamento esperado:
 
 - atualiza arquivos estruturais do workspace a partir de `claudeCode-workspace/`
+- sincroniza `.claude/rules/` e `.serena/`
 - preserva a secao de repositorios em `TOOLS.md`
-- faz merge conservador de `USER.md`, `MEMORY.md` e `.claude/settings.local.json`
+- preserva `USER.md` e `MEMORY.md`
+- so toca em `.claude/settings.local.json` quando voce pedir isso explicitamente
 - nao sobrescreve o conteudo dos repos internos em `repo/`
 - so limpa memoria e sessoes quando `-ResetRuntimeState` for informado
+
+### Passo 2.2. Criar um workspace descartavel para testar o template
+
+Quando quiser validar hooks, rules ou fluxo sem contaminar o template principal:
+
+```powershell
+.\scripts\new-disposable-workspace.ps1
+.\scripts\new-disposable-workspace.ps1 -Name 'teste-rules' -ForceRecreate
+```
+
+Esse script cria um sandbox dentro de `.tmp/`, reseta o runtime local
+(`memory/`, `Relatorios/agent-sessions/`, `.serena/memories/` e
+`.claude/worktrees/`) e so replica `.claude/settings.local.json` se voce pedir
+isso explicitamente.
 
 ### Passo 3. Coloque seus repositorios de codigo dentro da pasta `repo`
 
@@ -197,7 +223,7 @@ Esse mesmo placeholder tambem deve ser ajustado em `.claude/settings.json`, no `
 Esse arquivo define:
 
 - arquivos importados automaticamente
-- startup obrigatorio
+- fluxo de abertura da sessao
 - regras de seguranca
 - prioridade de MCPs
 - politica de worktrees
@@ -337,7 +363,7 @@ Ele faz o Claude:
 - validar o que foi alterado
 - pedir confirmacao antes de publicar, fazer push ou mexer fora do ambiente local
 
-## 7. Startup obrigatorio de cada sessao
+## 7. Abertura de sessao
 
 O `CLAUDE.md` do workspace define um gate de sessao. No fluxo atual:
 
@@ -389,9 +415,10 @@ Quando a demanda ja esta local no workspace:
 
 Quando a demanda ainda esta no GitHub:
 
-1. Rode `/gh-project` para descobrir ou filtrar itens.
-2. Rode `/delegate` para transformar a issue ou PR em task rastreavel no workspace.
-3. Rode `/backlog` para confirmar status, prioridade e fila local.
+1. Rode `/pickup listar` ou `/gh-project` para descobrir ou filtrar itens.
+2. Rode `/pickup planejar` para criar a umbrella task e sugerir os repos de execucao.
+3. Rode `/pickup executar` quando a inferencia de repo estiver clara ou voce ja souber os repos envolvidos.
+4. Use `/delegate` e `/start-task` separadamente quando quiser controlar cada etapa manualmente.
 
 ### Finalizacao de entrega
 
@@ -473,7 +500,7 @@ Os comandos ficam em:
 |---|---|
 | Abertura | hooks -> `/startup` se necessario -> `/heartbeat` se houver risco |
 | Triagem local | `/backlog` |
-| Triagem GitHub | `/gh-project` -> `/delegate` -> `/backlog` |
+| Triagem GitHub | `/pickup listar` -> `/pickup planejar` -> `/pickup executar` |
 | Execucao isolada | `/worktree` |
 | Finalizacao de entrega | validar -> `/commit-commands:commit` ou `/commit-commands:commit-push-pr` com descricao rica |
 | Limpeza pos-merge | atualizar `main` -> `/commit-commands:clean_gone` |
@@ -681,6 +708,19 @@ Se o fix tiver impacto visual, criar teste de API **e** teste Playwright corresp
 
 O pack trata worktree como mecanismo padrao para paralelo limpo e rastreavel.
 
+Pense no workspace principal como central de controle. Ele serve para listar
+issues, consultar projetos do GitHub, atualizar backlog e decidir o proximo
+passo. A worktree entra quando uma task vai sair da triagem e virar execucao.
+
+Fluxo recomendado por issue:
+
+1. analisar ou listar itens com `/pickup listar` ou `/gh-project`
+2. criar a umbrella task e sugerir os repos com `/pickup planejar`
+3. iniciar as tasks de execucao com `/pickup executar` ou `/start-task`
+4. abrir uma worktree por task de execucao no repo alvo
+5. manter uma relacao 1:1 entre task de execucao, branch, worktree e PR
+6. limpar a worktree apos merge, cancelamento ou encerramento da tarefa
+
 ### Dois tipos de worktree
 
 **Tipo `workspace`** — para isolar trabalho no proprio workspace (config, docs, experimentos):
@@ -705,12 +745,18 @@ Exemplos:
 Exemplos:
 
 ```text
-.wt/minha-api/feat-login-social
-.wt/portal-web/fix-header-mobile
+.wt/minha-api/gh-123-login-social
+.wt/portal-web/gh-456-header-mobile
 .wt/app-mobile/chore-upgrade-sdk
 ```
 
 O branch associado deve seguir prefixo convencional: `feat/`, `fix/`, `chore/`, `refactor/`, `docs/`.
+
+Quando a origem vier do GitHub, prefira:
+
+- worktree: `gh-<numero>-<slug>`
+- branch: `<prefixo>/<numero>-<slug>`
+- dono ou task: `gh:<org/repo>#<numero>`
 
 ### Regras operacionais do pack
 
@@ -735,16 +781,16 @@ git -C repo/minha-api worktree list --porcelain
 git worktree add .wt/workspace/ajuste-config -b chore/ajuste-config
 
 # Criar worktree de repo interno (a partir da raiz do workspace)
-git -C repo/minha-api worktree add ../../.wt/minha-api/feat-login-social -b feat/login-social
+git -C repo/minha-api worktree add ../../.wt/minha-api/gh-123-login-social -b fix/123-login-social
 
 # Status de uma worktree
-git -C .wt/minha-api/feat-login-social status --short --branch
+git -C .wt/minha-api/gh-123-login-social status --short --branch
 
 # Remover worktree do workspace
 git worktree remove .wt/workspace/ajuste-config && git worktree prune
 
 # Remover worktree de repo interno
-git -C repo/minha-api worktree remove ../../.wt/minha-api/feat-login-social
+git -C repo/minha-api worktree remove ../../.wt/minha-api/gh-123-login-social
 git -C repo/minha-api worktree prune
 ```
 
@@ -782,8 +828,10 @@ Regra pratica:
 ## 13. Boas praticas para usar o pack bem
 
 - mantenha `CLAUDE.md` do workspace curto, normativo e atualizado
+- use `.claude/rules/` para quebrar regras por tema e por path
 - mantenha `CLAUDE.md` de cada repo focado no que muda por repositorio
 - use `USER.md` para contexto operacional, nao para segredos
+- use `CLAUDE.local.md` para preferencias privadas em vez de editar arquivos versionados do template
 - trate `.claude/settings.json` como fonte canonica dos plugins ativos
 - registre a memoria no mesmo dia, nao depois
 - valide antes de concluir
@@ -839,7 +887,7 @@ Use esta lista para validar que a adocao ficou completa:
 7. Cada repo de codigo recebeu seu proprio `CLAUDE.md`.
 8. Os placeholders de cada repo foram substituidos.
 9. Os hooks de sessao foram revisados em `.claude/settings.json`.
-10. O startup obrigatorio foi entendido: hooks + `/startup` como fallback manual.
+10. O fluxo de abertura foi entendido: hooks + `/startup` como fallback manual.
 11. O time combinou uma convencao unica para worktrees.
 
 ## 16. Exemplo de rotina completa

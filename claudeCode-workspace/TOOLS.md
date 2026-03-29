@@ -78,162 +78,46 @@ O serena opera sobre um diretorio-raiz de projeto. Ao receber uma tarefa que env
 
 ---
 
-## Fluxo de sessao no Claude CLI
+## Operacao rapida
 
-Sequencia recomendada ao abrir o workspace:
+Fluxo base:
 
 1. abrir o Claude CLI na raiz do workspace
-2. deixar o hook `SessionStart` auto-inicializar a sessao e gravar `memory/_session-state.json`
-3. se houver bloqueio do `UserPromptSubmit` ou duvida de contexto, executar `/startup`
-4. ler o resumo retornado e confirmar se a tarefa da sessao vai usar workspace principal, repo interno ou worktree
-5. seguir com `/backlog`, `/worktree`, `/gh-project` e `/delegate` conforme o tipo de trabalho
+2. confiar no `SessionStart`; usar `/startup` se a sessao estiver duvidosa
+3. usar `/heartbeat` quando houver risco operacional
+4. descobrir demanda com `/gh-project` ou confirmar fila com `/backlog`
+5. usar `/pickup` para sair do Project e cair no backlog ou na execucao
+6. materializar demanda com `/delegate` quando quiser separar manualmente as etapas
+7. entrar em execucao com `/start-task`
+8. implementar, validar e abrir PR
+9. encerrar com `/finish-task` e `/close-session`
 
-Sequencia recomendada ao encerrar:
+## Commands principais
 
-1. executar `/close-session`
-2. conferir a memoria diaria, o relatorio de sessao e o marcador local atualizados
-3. deixar o hook `SessionEnd` registrar o encerramento leve ao fechar o CLI
-4. revisar pendencias, worktrees elegiveis para limpeza e proximos passos
-5. so entao encerrar o Claude CLI
+| Etapa | Command | Quando usar |
+|-------|---------|-------------|
+| Abertura | `/startup` | reabrir contexto ou reparar sessao |
+| Saude | `/heartbeat` | auditar backlog, supervisor e worktrees |
+| Triagem GitHub | `/gh-project` | listar ou filtrar items do Project |
+| Pickup do Project | `/pickup <acao>` | listar candidatos, delegar a demanda e sugerir ou iniciar execucao por repo |
+| Backlog | `/delegate` | criar a umbrella task local da demanda antes da execucao |
+| Execucao | `/start-task <numero> <org/repo> <repo-interno>` | criar ou retomar branch/worktree da execucao |
+| Multi-repo | `/worktree <acao>` | abrir worktree adicional fora do fluxo padrao |
+| Fechamento de execucao | `/finish-task <numero> <org/repo> <repo-interno>` | fechar ou atualizar a task de execucao |
+| Fechamento da sessao | `/close-session` | encerrar a sessao com memoria e relatorio |
 
-Regra pratica:
+## Regras praticas
 
-- se a auto-inicializacao falhar ou o prompt for bloqueado, executar `/startup`
-- se a sessao vai terminar, nao sair do CLI antes de rodar `/close-session`
-
-## Uso dos commands por fluxo
-
-Os commands devem acompanhar o fluxo da sessao. Evite usar comandos fora de ordem quando o efeito esperado depende do passo anterior.
-
-| Etapa | Command principal | Quando usar | Resultado esperado |
-|-------|-------------------|-------------|--------------------|
-| Abertura | `/startup` | quando o hook falhar, houver bloqueio de prompt ou a continuidade da sessao estiver duvidosa | contexto herdado validado, riscos listados e proximo passo recomendado |
-| Saude operacional | `/heartbeat` | no startup, ao retomar sessao longa ou quando houver suspeita de bloqueio operacional | panorama de riscos em backlog, supervisor, memoria e worktrees |
-| Triagem local | `/backlog` | quando a demanda ja existe no workspace ou voce precisa ver o que esta aberto | lista priorizada de tasks e status sincronizado com o supervisor |
-| Triagem GitHub | `/gh-project` | quando a demanda ainda esta no GitHub Project e precisa ser descoberta ou filtrada | itens candidatos para delegacao ou acao seguinte |
-| Entrada no backlog | `/delegate` | depois de identificar issue ou PR no GitHub que deve virar trabalho rastreavel no workspace | task criada ou atualizada em `Relatorios/Swarm/task-backlog.md` |
-| Isolamento de execucao | `/worktree <acao>` | quando a task pede isolamento de branch ou paralelo limpo no workspace ou em repo interno | worktree rastreavel pronta para execucao |
-| Finalizacao local | `/commit-commands:commit` | depois de validar as mudancas e deixar o stage pronto para commit | commit local criado com titulo convencional e corpo rico a partir das mudancas staged |
-| Finalizacao com PR | `/commit-commands:commit-push-pr` | quando a entrega ja pode virar push e PR com revisao | commit, push e PR abertos em sequencia com descricao rica no PR |
-| Limpeza pos-merge | `/commit-commands:clean_gone` | apos merges e sincronizacao local, para remover branches `[gone]` e worktrees associadas | limpeza segura de lixo local apos merge |
-| Registro durante a sessao | `/daily-memory` | em sessoes longas, mudancas operacionais relevantes ou antes de contexto se perder | fatos, riscos e decisoes do dia registrados |
-| Fechamento | `/close-session` | como ultimo comando antes de sair do CLI | memoria, relatorio de sessao e marcador local atualizados |
-
-### Sequencias recomendadas
-
-**1. Abrir ou retomar sessao**
-
-1. Hooks de sessao
-2. `/startup` se necessario
-3. `/heartbeat` quando o proprio startup apontar risco ou quando houver duvida operacional
-4. decidir se a sessao segue no workspace, em repo interno ou em worktree existente
-
-**2. Puxar demanda do GitHub para o workspace**
-
-1. `/gh-project` para descobrir ou filtrar itens
-2. `/delegate` para transformar a issue ou PR em task rastreavel
-3. `/backlog` para confirmar prioridade, status e fila local
-
-**3. Executar uma task local**
-
-1. `/backlog` para escolher ou confirmar a task ativa
-2. `/worktree criar ...` quando o trabalho precisar de isolamento
-3. execucao normal da tarefa com MCPs e agentes adequados
-4. `/commit-commands:commit` quando as mudancas ja estiverem validadas e staged
-5. `/commit-commands:commit-push-pr` quando a entrega puder seguir para revisao
-6. garantir que commit e PR tenham contexto, mudancas, validacao e risco descritos
-7. `/daily-memory` se a sessao ficar longa, mudar de contexto ou gerar decisao relevante
-
-**4. Encerrar a sessao**
-
-1. `/close-session`
-2. revisar pendencias, backlog e worktrees sinalizados pelo fechamento
-3. fechar o Claude CLI
-
-**5. Limpeza depois de merge**
-
-1. atualizar `main`
-2. usar `/commit-commands:clean_gone` para remover branches locais marcadas como `[gone]`
-3. revisar worktrees restantes
-
-### Regras de precedencia
-
-- `/startup` vem antes de qualquer command operacional quando a sessao estiver invalida ou duvidosa.
-- `/delegate` nao substitui `/backlog`; ele alimenta o backlog.
-- `/gh-project` descobre e filtra; `/delegate` materializa a demanda no workspace.
-- `/worktree` deve vir depois que a task estiver clara, e preferencialmente depois de existir backlog ou objetivo rastreavel.
-- `/commit-commands:commit` e `/commit-commands:commit-push-pr` entram so depois de validar a mudanca e preparar o stage.
-- `/commit-commands:commit-push-pr` nao substitui a regra de review; ele so abre o PR.
-- commit e PR devem registrar contexto, escopo, validacao e risco de forma legivel.
-- `/daily-memory` pode ser usado no meio da sessao, mas `/close-session` continua sendo o fechamento obrigatorio.
-
-### Padrao de descricao rica
-
-Commit:
-
-- primeira linha com conventional commit
-- corpo curto explicando contexto ou problema
-- lista curta das mudancas principais
-- validacao executada ou motivo da ausencia
-
-PR:
-
-- resumo do contexto e do objetivo
-- principais mudancas por area
-- validacao executada ou motivo da ausencia
-- riscos, impacto e pendencias
-- links para task, issue ou artefato quando houver
-
-### Exemplos
-
-**Commit:**
-
-```
-fix: corrigir calculo de prazo em despesas recorrentes
-
-O prazo estava sendo calculado com base na data de criacao do registro
-em vez da data de vencimento configurada pelo usuario.
-
-Mudancas:
-- corrigido calculo em `DespesaService.calcularPrazo`
-- adicionado teste cobrindo o caso de vencimento retroativo
-
-Validacao: teste unitario e teste de integracao passando localmente.
-```
-
-**PR:**
-
-```
-## Contexto
-Despesas recorrentes mostravam prazo incorreto quando o vencimento
-era anterior a data de criacao do registro.
-
-## Mudancas
-- DespesaService: corrigido calculo de prazo
-- tests/despesa: adicionado cenario de vencimento retroativo
-
-## Validacao
-Testes unitarios e de integracao passando. Reproduzido manualmente
-antes e apos a correcao.
-
-## Risco
-Baixo. Mudanca isolada em metodo de calculo sem efeito colateral
-em outros fluxos.
-```
-
-## Hooks de sessao
-
-Eventos configurados em `.claude/settings.json`:
-
-- `SessionStart`: cria ou repara `memory/_session-state.json`, garante memoria do dia e injeta contexto minimo
-- `UserPromptSubmit`: bloqueia prompts quando a sessao nao estiver validada ou ja tiver sido fechada logicamente
-- `SessionEnd`: registra a saida e marca quando o CLI foi encerrado sem `/close-session`
-
-Uso recomendado:
-
-- confiar nos hooks para enforcement leve e automatico
-- usar `/startup` para auditoria manual ou reabertura de contexto
-- usar `/close-session` para fechamento rico com memoria e relatorio
+- `SessionStart`, `UserPromptSubmit` e `SessionEnd` fazem o enforcement leve da sessao
+- GitHub Project e GitHub Issue/PR sao a fonte de verdade da demanda
+- `Relatorios/Swarm/task-backlog.md` guarda apenas tasks operacionais ativas
+- `/pickup` e o fluxo recomendado quando a demanda nasce no GitHub Project
+- em workspace gitado, prompts com cara de mudanca ficam bloqueados em `main`
+  e `master`; abra branch ou worktree antes de seguir
+- uma task de execucao deve mapear para um repo, uma branch e uma worktree
+- uma mesma demanda pode desdobrar varias tasks de execucao quando afetar varios repositorios
+- use `workspace` para triagem e coordenacao; use worktree para implementacao
+- detalhes de commit, PR e operacao longa ficam no `guia.md` e nos commands especializados
 
 ---
 
@@ -283,6 +167,64 @@ Convencao:
 - padrao de caminho: `.wt/<repo-em-kebab-case>/<objetivo-ou-branch>`
 - prefixo de branch recomendado: convencional (`feat/`, `fix/`, `chore/`, `refactor/`, `docs/`)
 - uma worktree por contexto ativo relevante
+
+### O que e uma worktree
+
+Uma worktree e um diretorio adicional do mesmo repositorio Git, com `HEAD`,
+`index` e arquivos de trabalho proprios. Na pratica, ela permite manter mais de
+uma branch ativa ao mesmo tempo sem misturar arquivos de uma tarefa com outra.
+
+Para este starter pack, a regra pratica e:
+
+- usar o workspace principal como central de triagem, backlog e GitHub
+- abrir worktree quando uma issue ou task for realmente entrar em execucao
+- evitar worktree para consulta rapida, leitura de issue ou triagem
+
+### Fluxo recomendado por issue do GitHub
+
+1. Descobrir ou filtrar a demanda com `/pickup listar` ou `/gh-project` no workspace principal.
+2. Usar `/pickup planejar` para criar a umbrella task e sugerir os repos de execucao.
+3. Usar `/pickup executar` quando o repo estiver claro ou vier explicito.
+4. Criar ou reutilizar uma worktree por task de execucao no repo alvo.
+5. Manter relacao 1:1: uma task de execucao -> uma branch -> uma worktree -> um PR.
+6. Apos merge ou cancelamento, limpar a worktree correspondente.
+
+Padrao recomendado quando a origem for GitHub:
+
+- worktree: `.wt/<repo>/gh-<numero>-<slug>`
+- branch: `<prefixo>/<numero>-<slug>`
+- dono: `gh:<org/repo>#<numero>::<repo-interno>`
+
+Fonte de verdade recomendada:
+
+- GitHub Project: priorizacao, visoes e fila macro
+- GitHub Issue/PR: contexto funcional e historico da demanda
+- `Relatorios/Swarm/task-backlog.md`: apenas tasks ativas, em execucao ou bloqueadas no workspace
+- worktree: isolamento tecnico da implementacao em andamento
+
+### Demandas multi-repo
+
+Quando a mesma demanda afetar varios repositorios, nao tente concentrar tudo em
+uma unica worktree.
+
+Padrao recomendado:
+
+- uma issue ou PR pode gerar varias tasks de execucao
+- cada task de execucao deve apontar para um repo ou faixa de mudanca clara
+- cada task de execucao ganha sua propria branch e worktree
+- todas podem compartilhar a mesma origem no GitHub
+
+Exemplos comuns:
+
+- `frontend-interno` e `frontend-externo` para a mesma entrega visual
+- `backend-interno` e `backend-externo` para a mesma integracao
+- `frontend` + `backend` quando a mudanca atravessa a aplicacao inteira
+
+Use worktree `workspace` apenas para evoluir o proprio template, docs, hooks ou
+scripts do workspace. Para issues de produto, prefira worktree `repo`.
+
+So use worktree detached (`git worktree add -d ...`) para experimento rapido ou
+teste descartavel. Para fluxo rastreavel por issue, use branch nomeada.
 
 Inventario minimo por worktree:
 
@@ -335,6 +277,13 @@ git worktree remove .wt/<repo>/<objetivo>
 
 # Podar metadata orfa
 git worktree prune
+```
+
+Exemplo rastreavel por issue:
+
+```bash
+git -C repo/minha-api worktree add ../../.wt/minha-api/gh-123-login-social -b fix/123-login-social
+git -C .wt/minha-api/gh-123-login-social status --short --branch
 ```
 
 Regras:

@@ -29,6 +29,106 @@ function Get-SessionStatePath {
     return (Join-Path (Get-SessionMemoryDir -WorkspaceRoot $WorkspaceRoot) "_session-state.json")
 }
 
+function Test-GitWorkspace {
+    param([string]$WorkspaceRoot)
+
+    try {
+        $null = & git -C $WorkspaceRoot rev-parse --is-inside-work-tree 2>$null
+        return ($LASTEXITCODE -eq 0)
+    } catch {
+        return $false
+    }
+}
+
+function Get-GitBranch {
+    param([string]$WorkspaceRoot)
+
+    if (-not (Test-GitWorkspace -WorkspaceRoot $WorkspaceRoot)) {
+        return ""
+    }
+
+    try {
+        $branchOutput = (& git -C $WorkspaceRoot branch --show-current 2>$null)
+        if ($branchOutput) {
+            return ([string]$branchOutput).Trim()
+        }
+    } catch {
+        return ""
+    }
+
+    return ""
+}
+
+function Get-GitWorkspaceStatus {
+    param([string]$WorkspaceRoot)
+
+    if (-not (Test-GitWorkspace -WorkspaceRoot $WorkspaceRoot)) {
+        return "unknown"
+    }
+
+    try {
+        $dirtyOutput = & git -C $WorkspaceRoot status --porcelain 2>$null
+        if ($dirtyOutput) {
+            return "dirty"
+        }
+
+        return "clean"
+    } catch {
+        return "unknown"
+    }
+}
+
+function Test-ProtectedBranch {
+    param([string]$Branch)
+
+    if ([string]::IsNullOrWhiteSpace($Branch)) {
+        return $false
+    }
+
+    return @("main", "master") -contains $Branch.Trim().ToLowerInvariant()
+}
+
+function Test-ReadOnlyPrompt {
+    param([string]$Prompt)
+
+    if ([string]::IsNullOrWhiteSpace($Prompt)) {
+        return $false
+    }
+
+    if ($Prompt -match '(?i)\b(sem alterar|sem editar|nao altere|não altere|apenas analise|somente analise|read-only)\b') {
+        return $true
+    }
+
+    $readOnlyPatterns = @(
+        '^\s*((pode\s+)?(analisar|analisa|avaliar|avalia|revisar|revise|review|inspecionar|inspecione|auditar|audite|listar|liste|mostrar|mostre|explicar|explique|consultar|consulte|buscar|busque|pesquisar|pesquise|comparar|compare|verificar|verifique|checar|cheque|status))\b',
+        '^\s*((pode\s+)?(fazer|faça))\s+(review|analise|análise|auditoria|inspecao|inspeção|comparacao|comparação|levantamento|diagnostico|diagnóstico)\b',
+        '^\s*(qual|quais|o que|como|onde|por que)\b',
+        '^\s*(show|list|review|analy[sz]e|inspect|audit|compare|check|what|which|why|how|where)\b'
+    )
+
+    foreach ($pattern in $readOnlyPatterns) {
+        if ($Prompt -match $pattern) {
+            return $true
+        }
+    }
+
+    return $false
+}
+
+function Test-ProtectedBranchSafePrompt {
+    param([string]$Prompt)
+
+    if ([string]::IsNullOrWhiteSpace($Prompt)) {
+        return $true
+    }
+
+    if (Test-ReadOnlyPrompt -Prompt $Prompt) {
+        return $true
+    }
+
+    return $Prompt -match '^\s*/(startup|close-session|daily-memory|help|hooks|clear|resume|heartbeat|backlog|gh-project|pickup|delegate|start-task|finish-task|worktree|review-deep|explain)\b'
+}
+
 function Initialize-Directory {
     param([string]$Path)
 
@@ -105,6 +205,7 @@ function New-DefaultSessionState {
         previous_session_unclosed    = $false
         ended_without_close_session  = $false
         branch                       = ""
+        branch_is_protected          = $false
         git_status                   = "unknown"
         last_session_report          = $null
         last_memory_file             = $LastMemoryFile

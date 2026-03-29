@@ -1,22 +1,17 @@
-# Segredos locais
+# Preferencias locais do Claude Code
 .claude/settings.local.json
+CLAUDE.local.md
 
-# Estado local nao rastreavel
-# memory/ e completamente local
+# Runtime local do workspace
+# memory/ e completamente local; apenas o README fica versionado
 memory/
 
-# Relatorios/agent-sessions/ — apenas o README e versionado; relatorios reais sao locais
+# Relatorios reais de sessao sao locais; apenas o README fica versionado
 Relatorios/agent-sessions/????-??-??-*.md
-
-# Area local de testes e configuracao (nao compartilhada com o template)
-_local/
 
 # Worktrees temporarias
 .wt/
+.claude/worktrees/
 
-# Serena MCP (estado local)
-.serena/memories/
-
-# Repositorios
+# Repositorios internos vivem fora do template
 repo/*/
-

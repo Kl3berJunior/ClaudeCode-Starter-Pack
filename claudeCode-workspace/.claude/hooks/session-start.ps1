@@ -43,25 +43,9 @@ if (Test-Path -LiteralPath $reportsDir) {
 
 $todayMemorySummary = Get-CompactSummary -Path $todayMemory
 $yesterdayMemorySummary = Get-CompactSummary -Path $yesterdayMemory
-$branch = ""
-$gitStatus = "unknown"
-
-try {
-    $branch = (& git -C $workspaceRoot branch --show-current 2>$null).Trim()
-} catch {
-    $branch = ""
-}
-
-try {
-    $dirtyOutput = & git -C $workspaceRoot status --porcelain 2>$null
-    if ($dirtyOutput) {
-        $gitStatus = "dirty"
-    } else {
-        $gitStatus = "clean"
-    }
-} catch {
-    $gitStatus = "unknown"
-}
+$branch = Get-GitBranch -WorkspaceRoot $workspaceRoot
+$gitStatus = Get-GitWorkspaceStatus -WorkspaceRoot $workspaceRoot
+$branchIsProtected = Test-ProtectedBranch -Branch $branch
 
 $previousSessionUnclosed = $false
 if ($previousState -and -not $previousState.close_done) {
@@ -77,6 +61,7 @@ $state.startup_source = $source
 $state.startup_at = (Get-Date).ToString("o")
 $state.previous_session_unclosed = $previousSessionUnclosed
 $state.branch = $branch
+$state.branch_is_protected = $branchIsProtected
 $state.git_status = $gitStatus
 $state.last_session_report = $latestReportRelative
 
@@ -89,6 +74,10 @@ $contextLines = @(
 
 if (-not [string]::IsNullOrWhiteSpace($branch)) {
     $contextLines += "Branch atual: $branch."
+}
+
+if ($branchIsProtected) {
+    $contextLines += "Alerta: branch protegida detectada. Antes de pedir mudancas, crie uma branch dedicada ou abra uma worktree rastreavel."
 }
 
 if ($gitStatus -ne "unknown") {
