@@ -1,13 +1,7 @@
 # CLAUDE.md — ClaudeCode-Starter-Pack
 
 Este repositorio e um **template base** para workspaces do Claude Code.
-O codigo aqui nao e um workspace real — e o molde que gera workspaces reais.
-
-## Papel deste repositorio
-
-- `claudeCode-workspace/` e o template canônico do workspace
-- `scripts/` contem os scripts de sincronizacao e criacao de sandbox
-- `.tmp/` e a area descartavel para testes (ignorada pelo git)
+`claudeCode-workspace/` e o molde — nao um workspace real.
 
 ## Regra de ouro
 
@@ -15,43 +9,45 @@ O codigo aqui nao e um workspace real — e o molde que gera workspaces reais.
 `__WORKSPACE_ROOT__` e similares sao intencionais — o script de sync os
 substitui em tempo de execucao.
 
-## Fluxo de trabalho aqui na raiz
+## Fluxo de trabalho
 
-### Fazer uma melhoria no template
+### 1. Editar o template
 
-1. Editar os arquivos dentro de `claudeCode-workspace/`
-2. Se adicionar arquivo novo ou mudar estrutura de pastas, atualizar
-   `scripts/sync-starter-pack-to-workspace.ps1` tambem
-3. Testar no workspace descartavel antes de commitar
+Arquivos do template ficam em `claudeCode-workspace/`.
+Se adicionar arquivo novo ou nova pasta de assets, atualizar tambem
+`scripts/sync-starter-pack-to-workspace.ps1`.
 
-### Testar no workspace descartavel
+### 2. Testar no sandbox
 
 ```powershell
-# Criar (ou recriar) o sandbox em .tmp/claudeCode-workspace-temp
+# Criar sandbox em .tmp/claudeCode-workspace-temp
+.\scripts\new-disposable-workspace.ps1
+
+# Recriar do zero (apaga e recria)
 .\scripts\new-disposable-workspace.ps1 -ForceRecreate
 
-# Abrir Claude Code no sandbox para validar
+# Incluir settings.local do template no sandbox
+.\scripts\new-disposable-workspace.ps1 -ForceRecreate -IncludeSettingsLocal
 ```
 
-O sandbox vive em `.tmp/claudeCode-workspace-temp/` e pode ser
-descartado e recriado quantas vezes quiser.
+Abrir o Claude Code apontando para `.tmp/claudeCode-workspace-temp/`.
 
-### Sincronizar para um workspace real
+### 3. Sincronizar para workspace real
 
 ```powershell
 .\scripts\sync-starter-pack-to-workspace.ps1 -TargetWorkspaceRoot 'C:\Caminho\Para\Workspace'
 ```
 
-## O que atualizar quando mudar o template
+## O que atualizar no sync script
 
-| O que mudou | O que revisar |
+| O que mudou no template | O que revisar |
 |---|---|
-| Arquivo novo em `claudeCode-workspace/` | Adicionar em `$filesToCopy` no sync script |
-| Nova pasta de assets (agents, hooks, rules) | Adicionar em `Get-RelativeFiles` no sync script |
-| Logica de merge de arquivo existente | Criar/ajustar funcao `Merge-*` no sync script |
-| Placeholder novo | Garantir que `Convert-WorkspaceText` o substitui |
+| Arquivo novo copiado diretamente | Adicionar em `$filesToCopy` |
+| Nova pasta de assets (agents, hooks, rules) | Adicionar em `Get-RelativeFiles` |
+| Arquivo com logica de merge (ex: TOOLS.md) | Criar/ajustar funcao `Merge-*` |
+| Placeholder novo | Garantir que `Convert-WorkspaceText` o cobre |
 
-## Estrutura relevante
+## Estrutura
 
 ```text
 ClaudeCode-Starter-Pack/
@@ -62,3 +58,5 @@ ClaudeCode-Starter-Pack/
 |-- claudeCode-workspace/  ← template do workspace
 `-- .tmp/                  ← sandboxes descartaveis (gitignored)
 ```
+
+Documentacao detalhada: `README.md` e `guia.md`.
