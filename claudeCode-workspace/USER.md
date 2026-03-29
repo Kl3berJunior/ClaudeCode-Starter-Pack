@@ -31,6 +31,10 @@ Nao colocar aqui segredos, tokens ou senhas.
 
 - raiz padrao: `.wt/`
 - convencao de nome: `.wt/workspace/<objetivo>` para trabalho no workspace, `.wt/<repo-em-kebab-case>/<objetivo>` para repos internos
+- usar o workspace principal para triagem e orquestracao; abrir worktree quando a task entrar em execucao
+- preferir uma issue ou task ativa por worktree
+- quando a mesma demanda afetar varios repos, abrir uma task de execucao por repo ou faixa de mudanca
+- quando a origem vier do GitHub, incluir o numero da issue ou PR no nome da branch e da worktree
 - abrir nova worktree quando houver tarefa paralela ou isolamento de contexto necessario
 - auditar worktrees no heartbeat de cada sessao
 - nunca remover worktree com mudancas nao commitadas sem confirmar antes

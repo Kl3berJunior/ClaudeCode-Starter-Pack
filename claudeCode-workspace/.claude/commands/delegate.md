@@ -43,10 +43,10 @@ Se `tipo` nao for informado:
 ## Regras de derivacao
 
 Id da task:
-- usar formato estavel: `gh:<org/repo>#<numero>`
+- usar formato estavel de umbrella task: `gh:<org/repo>#<numero>::triage`
 
 Repo:
-- usar exatamente o valor informado em `<org/repo>`
+- usar `-` quando a demanda ainda nao estiver associada a um repo de execucao
 
 Titulo:
 - usar o `title` retornado pelo GitHub
@@ -70,18 +70,19 @@ Prioridade:
 ## Escrita no backlog
 
 Formato canonico:
-`| Id | Repo | Titulo | Status | Prioridade | Origem |`
+`| TaskId | Repo | Titulo | Status | Prioridade | Branch | Worktree | Origem |`
 
 Regras:
 1. Ler `Relatorios/Swarm/task-backlog.md`
 2. Se existir `_Nenhuma task aberta._` e for adicionar a primeira task, remover essa linha
-3. Se ja existir linha com o mesmo `Id`, atualizar a linha em vez de duplicar
-4. Se nao existir, adicionar nova linha mantendo a tabela Markdown valida
-5. Nunca apagar outras tasks
+3. Se ja existir linha com o mesmo `TaskId`, atualizar a linha em vez de duplicar
+4. Ao delegar a task pela primeira vez, inicializar `Repo`, `Branch` e `Worktree` com `-`
+5. Se nao existir, adicionar nova linha mantendo a tabela Markdown valida
+6. Nunca apagar outras tasks
 
 Formato da linha:
 ```md
-| gh:<org/repo>#<numero> | <org/repo> | <titulo> | <status> | <prioridade> | <url> |
+| gh:<org/repo>#<numero>::triage | - | <titulo> | <status> | <prioridade> | - | - | <url> |
 ```
 
 ## Sincronizacao do supervisor
@@ -130,9 +131,9 @@ Formato sugerido:
 ```md
 Task delegada com sucesso.
 
-- id: gh:<org/repo>#<numero>
+- id: gh:<org/repo>#<numero>::triage
 - tipo: <issue-ou-pr>
-- repo: <org/repo>
+- repo: -
 - titulo: <titulo>
 - status: <status>
 - prioridade: <prioridade>
@@ -142,6 +143,8 @@ Task delegada com sucesso.
 ## Regras operacionais
 - este comando nao executa merge
 - este comando nao altera issue, PR ou project no GitHub; apenas le metadados
+- este comando cria a umbrella task local; `/start-task` e o responsavel por abrir a execucao por repo
+- o GitHub continua sendo a fonte de verdade da demanda
 - se a task ja existir no backlog, atualizar em vez de duplicar
 - se o item estiver fechado, cancelado ou merged, confirmar com o usuario antes de delegar
 - em caso de erro do `gh`, nao editar backlog parcialmente

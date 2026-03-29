@@ -2,7 +2,7 @@
 param(
     [string]$TargetWorkspaceRoot = 'C:\Sistema\claudeCode-workspace',
     [switch]$ResetRuntimeState,
-    [switch]$SkipSettingsLocal
+    [switch]$MergeSourceSettingsLocal
 )
 
 $ErrorActionPreference = 'Stop'
@@ -16,7 +16,9 @@ if (-not (Test-Path -LiteralPath $sourceWorkspaceRoot)) {
 
 $resolvedTargetRoot = [System.IO.Path]::GetFullPath($TargetWorkspaceRoot)
 if (-not (Test-Path -LiteralPath $resolvedTargetRoot)) {
-    throw "Workspace alvo nao encontrado: $resolvedTargetRoot"
+    if ($PSCmdlet.ShouldProcess($resolvedTargetRoot, 'Create target workspace root')) {
+        New-Item -ItemType Directory -Path $resolvedTargetRoot -Force | Out-Null
+    }
 }
 
 $sourceWorkspaceRootUnix = $sourceWorkspaceRoot.Replace('\', '/')
@@ -59,6 +61,14 @@ function Convert-WorkspaceText([string]$Content) {
     return [System.Text.RegularExpressions.Regex]::Replace($Content, $pattern, { $resolvedTargetRootUnix })
 }
 
+function Contains-OrdinalIgnoreCase([string]$Haystack, [string]$Needle) {
+    if ([string]::IsNullOrEmpty($Haystack) -or [string]::IsNullOrEmpty($Needle)) {
+        return $false
+    }
+
+    return $Haystack.IndexOf($Needle, [System.StringComparison]::OrdinalIgnoreCase) -ge 0
+}
+
 function Copy-FileFromSource([string]$RelativePath) {
     $sourcePath = Join-Path $sourceWorkspaceRoot $RelativePath
     $targetPath = Join-Path $resolvedTargetRoot $RelativePath
@@ -81,14 +91,18 @@ function Copy-FileFromSource([string]$RelativePath) {
     $copiedFiles.Add($RelativePath) | Out-Null
 }
 
-function Get-RelativeFiles([string]$RelativeDirectory, [string]$Filter) {
+function Get-RelativeFiles(
+    [string]$RelativeDirectory,
+    [string]$Filter,
+    [switch]$Recurse
+) {
     $absoluteDirectory = Join-Path $sourceWorkspaceRoot $RelativeDirectory
     if (-not (Test-Path -LiteralPath $absoluteDirectory)) {
         return @()
     }
 
-    return Get-ChildItem -LiteralPath $absoluteDirectory -File -Filter $Filter |
-        Sort-Object Name |
+    return Get-ChildItem -LiteralPath $absoluteDirectory -File -Filter $Filter -Recurse:$Recurse |
+        Sort-Object FullName |
         ForEach-Object {
             $_.FullName.Substring($sourceWorkspaceRoot.Length).TrimStart('\')
         }
@@ -133,7 +147,7 @@ function Merge-SettingsLocal() {
     $sourcePath = Join-Path $sourceWorkspaceRoot '.claude\settings.local.json'
     $targetPath = Join-Path $resolvedTargetRoot '.claude\settings.local.json'
 
-    if ($SkipSettingsLocal) {
+    if (-not $MergeSourceSettingsLocal) {
         return
     }
 
@@ -222,7 +236,7 @@ function Merge-BulletSection(
     $targetBody = $targetMatch.Groups['body'].Value.TrimEnd("`r", "`n")
     $missingBullets = @(
         $sourceBullets | Where-Object {
-            -not $targetBody.Contains($_, [System.StringComparison]::OrdinalIgnoreCase)
+            -not (Contains-OrdinalIgnoreCase $targetBody $_)
         }
     )
 
@@ -311,7 +325,7 @@ function Merge-Memory() {
 
     $missingBullets = @(
         $sourceBullets | Where-Object {
-            -not $targetContent.Contains($_, [System.StringComparison]::OrdinalIgnoreCase)
+            -not (Contains-OrdinalIgnoreCase $targetContent $_)
         }
     )
 
@@ -347,9 +361,25 @@ function Reset-RuntimeState() {
             }
     }
 
+    $serenaMemoriesDir = Join-Path $resolvedTargetRoot '.serena\memories'
+    if (Test-Path -LiteralPath $serenaMemoriesDir) {
+        if ($PSCmdlet.ShouldProcess($serenaMemoriesDir, 'Remove Serena runtime directory')) {
+            Remove-Item -LiteralPath $serenaMemoriesDir -Recurse -Force
+        }
+    }
+
+    $claudeWorktreesDir = Join-Path $resolvedTargetRoot '.claude\worktrees'
+    if (Test-Path -LiteralPath $claudeWorktreesDir) {
+        if ($PSCmdlet.ShouldProcess($claudeWorktreesDir, 'Remove Claude worktree runtime directory')) {
+            Remove-Item -LiteralPath $claudeWorktreesDir -Recurse -Force
+        }
+    }
+
     Copy-FileFromSource 'Relatorios\Swarm\supervisor-status.md'
     $resetItems.Add('memory/* (exceto README.md)') | Out-Null
     $resetItems.Add('Relatorios/agent-sessions/* (exceto README.md)') | Out-Null
+    $resetItems.Add('.serena/memories/') | Out-Null
+    $resetItems.Add('.claude/worktrees/') | Out-Null
     $resetItems.Add('Relatorios/Swarm/supervisor-status.md') | Out-Null
 }
 
@@ -359,14 +389,17 @@ $filesToCopy = @(
     'CLAUDE.md',
     'HEARTBEAT.md',
     'SOUL.md',
+    '.serena\.gitignore',
+    '.serena\project.yml',
     'repo\CLAUDE.md',
     'memory\README.md',
     'Relatorios\agent-sessions\README.md'
 )
 
-$filesToCopy += Get-RelativeFiles '.claude\agents' '*.md'
-$filesToCopy += Get-RelativeFiles '.claude\commands' '*.md'
-$filesToCopy += Get-RelativeFiles '.claude\hooks' '*.ps1'
+$filesToCopy += Get-RelativeFiles '.claude\agents' '*.md' -Recurse
+$filesToCopy += Get-RelativeFiles '.claude\commands' '*.md' -Recurse
+$filesToCopy += Get-RelativeFiles '.claude\hooks' '*.ps1' -Recurse
+$filesToCopy += Get-RelativeFiles '.claude\rules' '*.md' -Recurse
 
 foreach ($relativePath in ($filesToCopy | Sort-Object -Unique)) {
     Copy-FileFromSource $relativePath

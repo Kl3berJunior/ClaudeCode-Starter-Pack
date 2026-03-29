@@ -10,6 +10,11 @@ Regra:
 
 Contratos duraveis deste workspace:
 
+- GitHub Issues e GitHub Projects sao a fonte de verdade da demanda; o backlog
+  local guarda apenas o recorte operacional ativo do workspace
+- uma mesma demanda pode desdobrar varias tasks de execucao, cada uma com repo,
+  branch e worktree proprios
+- para tasks vindas do GitHub, preferir worktree `gh-<numero>-<slug>` e branch `<prefixo>/<numero>-<slug>`
 - worktrees operacionais vivem em `.wt/` com dois subtipos:
   - workspace: `.wt/workspace/<objetivo>` — para trabalho no proprio workspace
   - repo interno: `.wt/<repo-kebab-case>/<objetivo>` — repos em `repo/` sao git repos separados, usar `git -C repo/<nome> worktree`

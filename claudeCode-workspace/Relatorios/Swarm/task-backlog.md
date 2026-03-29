@@ -1,6 +1,6 @@
 # Task Backlog
 
-| Id | Repo | Titulo | Status | Prioridade | Origem |
-|----|------|--------|--------|------------|--------|
+| TaskId | Repo | Titulo | Status | Prioridade | Branch | Worktree | Origem |
+|--------|------|--------|--------|------------|--------|----------|--------|
 
 _Nenhuma task aberta._
