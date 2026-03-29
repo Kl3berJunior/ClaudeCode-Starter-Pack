@@ -63,9 +63,11 @@ Plugins esperados no pack:
 2. Se a sessao estiver duvidosa, rode `/startup`.
 3. Use `/heartbeat` quando houver risco operacional.
 4. Use `/pickup` quando a demanda vier do GitHub Project.
-5. Trabalhe no workspace, em `repo/` ou em uma worktree rastreavel.
-6. Registre fatos do dia em `/daily-memory`.
-7. Feche a sessao com `/close-session`.
+5. Se o workspace estiver em `main` ou `master`, abra branch ou worktree antes
+   de pedir mudancas.
+6. Trabalhe no workspace, em `repo/` ou em uma worktree rastreavel.
+7. Registre fatos do dia em `/daily-memory`.
+8. Feche a sessao com `/close-session`.
 
 ## Onde cada coisa deve viver
 

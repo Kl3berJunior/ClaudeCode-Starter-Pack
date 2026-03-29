@@ -64,4 +64,15 @@ if ($state.close_done) {
     exit 0
 }
 
+$currentBranch = Get-GitBranch -WorkspaceRoot $workspaceRoot
+if (Test-ProtectedBranch -Branch $currentBranch) {
+    if (-not (Test-ProtectedBranchSafePrompt -Prompt $prompt)) {
+        New-GuardBlockResponse `
+            -Reason "Branch protegida detectada. Crie uma branch dedicada ou use uma worktree antes de pedir mudancas." `
+            -AdditionalContext "O workspace esta em '$currentBranch', que e uma branch protegida. Prompts com cara de execucao ou mudanca ficam bloqueados nesse contexto para evitar trabalho direto em main/master. Abra uma branch dedicada com git switch -c <prefixo>/<objetivo> ou use /worktree antes de continuar." |
+            Write-HookJson
+        exit 0
+    }
+}
+
 exit 0

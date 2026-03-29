@@ -112,6 +112,8 @@ Fluxo base:
 - GitHub Project e GitHub Issue/PR sao a fonte de verdade da demanda
 - `Relatorios/Swarm/task-backlog.md` guarda apenas tasks operacionais ativas
 - `/pickup` e o fluxo recomendado quando a demanda nasce no GitHub Project
+- em workspace gitado, prompts com cara de mudanca ficam bloqueados em `main`
+  e `master`; abra branch ou worktree antes de seguir
 - uma task de execucao deve mapear para um repo, uma branch e uma worktree
 - uma mesma demanda pode desdobrar varias tasks de execucao quando afetar varios repositorios
 - use `workspace` para triagem e coordenacao; use worktree para implementacao

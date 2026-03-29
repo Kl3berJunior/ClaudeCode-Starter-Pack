@@ -3,6 +3,8 @@
 Contexto operacional do time para guiar o comportamento do agente.
 
 Nao colocar aqui segredos, tokens ou senhas.
+Ao instalar o template, substitua todos os placeholders `__...__` antes de usar
+o workspace em producao.
 
 ## Time e ambiente
 
